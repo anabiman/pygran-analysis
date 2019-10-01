@@ -18,3 +18,4 @@ PyGran.egg-info*
 *.ipynb
 _docs
 _manual
+__pycache__
