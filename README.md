@@ -32,13 +32,13 @@ Using PyGran.analysis for doing post-analysis is quite straight forward. Computi
 <p style="text-align:center;"><img src="http://andrew-abimansour.github.io/PyGran/images/overlap-hist.png"></p>
 
 ```python
-import PyGran.analysis
+import analysis
 
 # Instantiate a System class from a dump file
-Gran = PyGran.analysis.System(Particles='granular.dump')
+Gran = analysis.System(Particles='granular.dump')
 
 # Instantiate a nearest-neighbors class
-NNS = PyGran.analysis.Neighbors(Particles=Gran.Particles)
+NNS = analysis.Neighbors(Particles=Gran.Particles)
 overlaps = NNS.overlaps
 ```
 For more examples on using PyGran for analyzing DEM simulation, check out the <a href="http://andrew-abimansour.github.io/PyGran/tests/examples.html">examples</a> page.
