@@ -30,7 +30,7 @@ from setuptools import setup, find_packages
 import glob, shutil, re
 from distutils.command.install import install
 from distutils.command.clean import clean
-from _version import __version__, __author__, __email__
+from analysis._version import __version__, __author__, __email__
 
 try:
 	from Cython.Build import cythonize
@@ -51,7 +51,7 @@ setup(
 		license = "GNU v2",
 		keywords = "Discrete Element Method, Granular Materials",
 		url = "https://github.com/Andrew-AbiMansour/PyGran",
-		packages=find_packages('.'),
+		packages=find_packages(),
 		include_package_data=True,
 		install_requires=['numpy', 'scipy'],
 		extras_require={'extra': ['vtk', 'Pillow']},
