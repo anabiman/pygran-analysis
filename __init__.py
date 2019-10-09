@@ -1,7 +1,7 @@
 '''
 A module that acts as a wrapper for all analysis objects
 
-Created on October 10, 2019
+Created on October 08, 2019
 
 Author: Andrew Abi-Mansour
 
@@ -29,4 +29,4 @@ If not, see http://www.gnu.org/licenses . See also top-level README
 and LICENS
 '''
 
-from .analysis import *
+from .PyGranAnalysis import *
