@@ -2,7 +2,7 @@
         Created on Apil 25, 2016
         @author: Andrew Abi-Mansour
 
-        This is the
+        This is the::
          __________         ________
         ██████╗ ██╗   ██╗ ██████╗ ██████╗  █████╗ ███╗   ██╗
         ██╔══██╗╚██╗ ██╔╝██╔════╝ ██╔══██╗██╔══██╗████╗  ██║
@@ -26,7 +26,7 @@
  '''
 
 from .core import *
-
+from ._version import __version__, __author__, __email__
 from . import dynamics
 from . import equilibrium
 from . import imaging
