@@ -30,15 +30,21 @@ and LICENS
 '''
 
 from setuptools import setup, find_packages
-import glob, shutil, re
-from distutils.command.install import install
-from distutils.command.clean import clean
-from analysis._version import __version__, __author__, __email__
+import os
 
+# Extract metadata from _version
+with open(os.path.join('PyGranAnalysis', '_version.py'), 'r') as fp:
+        for line in fp.readlines():
+                if '__version__' in line:
+                        __version__ = line.split('=')[-1].strip().strip("''")
+                elif '__email__' in line:
+                        __email__ = line.split('=')[-1].strip().strip("''")
+                elif '__author__' in line:
+                        __author__ = line.split('=')[-1].strip().strip("''")
 try:
 	from Cython.Build import cythonize
 	import numpy
-	optimal_list = cythonize("src/core.pyx")
+	optimal_list = cythonize("PyGranAnalysis/core.pyx")
 	include_dirs = [numpy.get_include()]
 except:
 	print('Could not cythonize. Make sure Cython is properly installed.')
@@ -46,7 +52,7 @@ except:
 	include_dirs = []
 
 setup(
-	name = "PyGran.analysis",
+	name = "PyGranAnalysis",
 	version = __version__,
 	author = __author__,
 	author_email = __email__,
