@@ -12,7 +12,6 @@ out*
 build
 PyDEM.egg-info
 dist
-.config
 *.c
 PyGran.egg-info*
 *.ipynb
