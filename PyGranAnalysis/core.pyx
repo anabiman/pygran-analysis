@@ -45,7 +45,7 @@ try:
 except:
 	pass
 
-from PyGran.tools import convert
+from .tools import convert
 from scipy.stats import binned_statistic
 import importlib
 import numbers
