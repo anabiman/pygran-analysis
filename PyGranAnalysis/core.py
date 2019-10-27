@@ -56,7 +56,7 @@ these properties. This class is iterable but NOT an iterator.
 	:param units: unit system
 	:type units: string 
 
-	:note: see `link <https://github.com/Andrew-AbiMansour/PyGran/blob/master/src/PyGran/modules/tools/__init__.py>`_ for available unit systems
+	:note: see `link <https://github.com/Andrew-AbiMansour/PyGranAnalysis/blob/master/PyGranAnalysis/tools.py>`_ for available unit systems
 	"""
 
 	def __init__(self, **args):
@@ -97,6 +97,9 @@ these properties. This class is iterable but NOT an iterator.
 				else:
 					raise RuntimeError('units must be supplied when creating SubSystem from a data dictionary.')
 
+				# update unit system
+				self.units(self._units)
+
 			if 'fname' in args:
 				self._fname = args['fname']
 
@@ -105,7 +108,7 @@ these properties. This class is iterable but NOT an iterator.
 
 		# If data is already copied from Particles, do nothing
 		if not hasattr(self, 'data'):
-			self.data = collections.OrderedDict() # am ordered dict that contains either arrays
+			self.data = collections.OrderedDict() # an ordered dict that contains either arrays
 			#(for storing pos, vels, forces, etc.), scalars (natoms, ) or tuples (box size).
 			# ONLY arrays can be slices based on user selection.
 
@@ -586,7 +589,7 @@ class Mesh(SubSystem):
 
 					elif 'CellVol' in self.data:
 						self.data[newkey] = (self.data['CellVol'] * self.data[newkey].T).T.sum(axis=0) / self.data['CellVol'].sum()
-						
+
 				index += 1
 			else:
 				break
@@ -602,7 +605,7 @@ class Mesh(SubSystem):
 				break
 
 		self._constructAttributes(mesh=True)
-		
+
 	def _updateSystem(self):
 		""" Class function for updating the state of a Mesh """
 		# Must make sure fname is passed in case we're looping over a trajectory
@@ -650,7 +653,7 @@ class Mesh(SubSystem):
 
 	def _resetSubSystem(self):
 
-		self.__init__(**self._args) 
+		self.__init__(**self._args)
 		super(Mesh, self)._resetSubSystem()
 
 		return 0
@@ -677,9 +680,9 @@ class Particles(SubSystem):
 				if self._fname:
 					self._ftype = self._fname.split('.')[-1]
 
-					if self._ftype == 'dump': # need a way to figure out this is a LIGGGHTS/LAMMPS file
+					if self._ftype == 'dump': # need a better way to figure out this is a LIGGGHTS/LAMMPS file
 
-						if self._fname.split('.')[:-1][0].endswith('*'):
+						if '*' in self._fname:
 							self._files = sorted(glob.glob(self._fname), key=numericalSort)
 							self._fp = open(self._files[0], 'r')
 						else:
@@ -773,7 +776,7 @@ class Particles(SubSystem):
 
 	def _resetSubSystem(self):
 
-		self.__init__(**self._args) 
+		self.__init__(**self._args)
 		super(Particles, self)._resetSubSystem()
 
 		return 0
@@ -859,7 +862,7 @@ class Particles(SubSystem):
 			x -= x.mean()
 			y -= y.mean()
 			z -= z.mean()
-		
+
 		S = min(x.max(), y.max(), z.max())
 
 		if rMax is None:
@@ -1000,13 +1003,13 @@ class Particles(SubSystem):
 
 		if not resol:
 			resol = self.radius.min()
-	
+
 		_, a, total = self.intensitySegregation(resol)
 
 		if not maxDist:
 			maxDim = max(a.shape)
 			maxDist = int(np.sqrt(3 * maxDim**2)) + 1
-		
+
 		volMean = a[total > 0].mean()
 		volVar = a[total > 0].std()**2
 
@@ -1046,7 +1049,7 @@ class Particles(SubSystem):
 		@[shape]: box, cylinder-x, cylinder-y, or cylinder-z
 
 		"""
-		
+
 		return self.computeMass(tdensity).sum() / self.computeVolume(shape)
 
 	def computeDensityLocal(self, bdensity, dr, axis):
@@ -1145,7 +1148,7 @@ class Particles(SubSystem):
 				tmp = frame
 				frame = 0
 
-				del self._fp
+				# why delete _fp? it creates problems in lines 1288 del self._fp
 				self._readFile(0)
 				return self._goto(tmp, 1)
 
@@ -1162,11 +1165,10 @@ class Particles(SubSystem):
 						pass
 					else:
 						if iframe == -1:
-							iframe = len(self._files) - 1
+							frame = len(self._files) - 1
 
 						self._fp.close()
 						self._fp = open(self._files[frame], 'r')
-						frame = iframe
 						self._readDumpFile()
 
 		return frame
@@ -1283,13 +1285,13 @@ class Particles(SubSystem):
 		else:
 			skip = 0
 
-		# We are opening the traj file for the 1st time
+		# This means we are opening the traj file for the 1st time
 		if not hasattr(self, '_fp'):
 			self._fp = open(self._fname, 'r')
 
 		if not hasattr(self, '_singleFile'):
 
-			if self._fname.split('.')[:-1][0].endswith('*'):
+			if '*' in self._fname:
 				self._singleFile = False
 			else:
 				self._singleFile = True
@@ -1299,10 +1301,8 @@ class Particles(SubSystem):
 				ts = self._readDumpFile()
 				self.data['timestep'] = ts
 				self._constructAttributes()
-
 			else:
 				raise IOError('{} format is not a supported trajectory file.'.format(self._ftype))
-
 		else:
 			if self._ftype == 'dump':
 
@@ -1483,29 +1483,41 @@ class System(object):
 	'Particles' or 'Mesh' type. Multiple objects can be created by this class if a list of 
 	filenames are passed to its constructors.
 
-	@[Particles]: filename (or list of filenames) for the particle trajectory
-	@[Mesh]: filename (or list of filenames) for the mesh trajectory
-	@[units](si): unit system can be either 'si' or 'micro'
-	@[module]: for user-defined dervied SubSystems, 'module' must be a string that specifies the name of 
+	:param SubSystem: SubSystem (or its subclass) definition e.g. Particles or Mesh
+	:type SubSystem: str / list[str]
+
+	:param units: unit system can be either 'si' or 'micro'
+	:type units: str
+
+	:param module: for user-defined dervied SubSystems, module specifies the name of 
 	the module in which the user-defined class is defined.
+	:type module: str
 
-	How time stepping works: when looping over System (traj file), the frame is controlled only by System
-	through methods defined in a SubSystem sublass (read/write functions).
+	:param units: unit system specification for input data, defaults to 'si'
+	:type units: str
 
-	This class is an iterator.
+	.. note:: This class is an iterator that enables time stepping: when looping over System (storing a traj file), 
+	the frame is controlled only by System through methods defined in a SubSystem sublass (read/write functions).
+
+	
 	"""
 
 	def __init__(self, **args):
 
 		self.frame = 0
-		self.args = args
+		self.args = args.copy()
+
+		# SubSystem cannot handle any units
+		if 'units' in args:
+			del args['units']
+
 		objs = Factory.factory(**args)
 
 		for ss, obj in objs:
 			setattr(self, ss, obj)
 
-		if 'units' in args:
-			self.units(args['units'])
+		if 'units' in self.args:
+			self.units(self.args['units'])
 		else:
 			self.units('si')
 
@@ -1513,21 +1525,23 @@ class System(object):
 		self.rewind()
 		return self
 
-	def units(self, units=None):
+	def units(self, iunits=None):
 		""" Change unit system to units ore return units if None
 		units:  si, micro, cgs, or nano """
 
-		if not units:
+		from .tools import conversion
+
+		if not iunits:
 			return self._units
 
-		if (units == 'si') or (units == 'micro'):
+		if iunits in conversion.keys():
 			for ss in self.__dict__:
 				if hasattr(self.__dict__[ss], 'units'):
-					self.__dict__[ss].units(units)
+					self.__dict__[ss].units(iunits)
 
-			self._units = units
+			self._units = iunits
 		else:
-			print('Only S.I. and micro units currently supported')
+			raise ValueError('Unit system {} not supported'.format(iunits))
 
 	def goto(self, frame):
 		""" Go to a specific frame in the trajectory. If frame is -1
@@ -1605,7 +1619,7 @@ class System(object):
 		return self.next()
 
 	def next(self):
-		""" This method updates the system attributes! """
+		""" This method updates the system attributes. """
 		update_frame = False
 
 		try:
@@ -1672,13 +1686,24 @@ def numericalSort(value):
 
 def select(data, *region):
 	"""
-	Create a selection of particles based on a subsystem defined by region
-	@ region: a tuple (xmin, xmax, ymin, ymax, zmin, zmax). If undefined, all particles are considered.
+	Create a selection of particles based on a region-defined subsystem.
+	:param data: input data
+	:type data:  dict
+
+	:param region: defines the region in the form: (xmin, xmax, ymin, ymax, zmin, zmax). 
+	:type region: tuple
+
+	:return: indices of selected atoms
+	:rtype: list
+	
+	.. todo:: Make this function more generic and compliant with the rest of this module
+
+	.. note:: when region is not supplied, all particle indices are returned
 	"""
 
 	try:
 		if not len(region):
-			return np.arange(data['NATOMS'], dtype='int')
+			return [i for i in range(data['NATOMS'])]
 		else:
 			if len(region) != 6:
 				print('Length of region must be 6: (xmin, xmax, ymin, ymax, zmin, zmax)')
