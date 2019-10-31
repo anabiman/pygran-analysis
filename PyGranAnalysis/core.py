@@ -60,10 +60,16 @@ these properties. This class is iterable but NOT an iterator.
 	"""
 
 	def __init__(self, **args):
+		self._initilize(**args)
+
+	def _initialize(self, **args):
+		""" This function exists mostly for convenience. It does everything expected from __init__ and is used by other methods 
+		such as _resetSubSystem """
 
 		self._units = 'si'
 		self._fname = None
 		self._args = args
+		self._iargs = args.copy() # used for re-initializing system
 
 		if type(self).__name__ in args:
 
@@ -131,9 +137,7 @@ these properties. This class is iterable but NOT an iterator.
 
 	def _resetSubSystem(self):
 		""" Mainly used by System for rewinding traj back to frame 0 """
-
 		self._constructAttributes()
-
 		return 0
 
 	def _constructAttributes(self, sel=None, mesh=False):
@@ -200,7 +204,7 @@ these properties. This class is iterable but NOT an iterator.
 		else:
 			# Get the type of the class (not necessarily SubSystem for derived classes)
 			module = importlib.import_module(__name__)
-			
+
 		cName = getattr(module, type(self).__name__)
 
 		return cName(sel=sel, units=self._units, data=self.data.copy())
@@ -223,7 +227,7 @@ these properties. This class is iterable but NOT an iterator.
 	def conversion(self, factors):
 		""" Convesion factors from S.I., micro, cgs, or nano, and vice versa 
 
-		TODO: support all possible variables (is this possible???) """
+		.. todo:: support all possible variables (is this possible???) """
 
 		for key in self.data.keys():
 
@@ -231,7 +235,7 @@ these properties. This class is iterable but NOT an iterator.
 
 				if(type(self.data[key]) == np.ndarray):
 					self.data[key].flags.writeable = True
-				
+
 				self.data[key] *= factors['distance'][0]
 
 				if(type(self.data[key]) == np.ndarray):
@@ -294,7 +298,7 @@ these properties. This class is iterable but NOT an iterator.
 
 	def __add__(self, obj):
 		""" Adds two classes together, or operates scalars/vectors on particle radii/positions
-		TODO: get this working with meshes."""
+		.. todo:: get this working with meshes."""
 
 		data = collections.OrderedDict()
 
@@ -320,7 +324,7 @@ these properties. This class is iterable but NOT an iterator.
 
 	def __sub__(self, obj):
 		""" Subtracts scalars/vectors from particle radii/positions
-		TODO: get this working with meshes """
+		.. todo:: get this working with meshes """
 
 		if type(obj) is tuple:
 			obj, att = obj
@@ -336,7 +340,7 @@ these properties. This class is iterable but NOT an iterator.
 
 	def __mul__(self, obj):
 		""" Multiplies scalars/vectors from particle radii/positions
-		TODO: get this working with meshes """
+		.. todo:: get this working with meshes """
 
 		if type(obj) is not type(self):
 			raise RuntimeError('Two subsystems with different types cannot be multiplied.')
@@ -362,7 +366,7 @@ these properties. This class is iterable but NOT an iterator.
 
 	def __div__(self, obj):
 		""" Divides scalars/vectors from particle radii/positions
-		TODO: get this working with meshes """
+		.. todo:: get this working with meshes """
 
 		if type(obj) is tuple:
 			obj, att = obj
@@ -476,12 +480,17 @@ class Mesh(SubSystem):
 	"""  The Mesh class stores a list of meshes and their associated attributes / methods.
 	This class is iterable but NOT an iterator.
 
-	@fname: mesh filename
-	"""
-	def __init__(self, fname, **args):
+	:param fname: mesh filename
+	:type fname: str
 
-		if 'avgCellData' not in args:
-			args['avgCellData'] = False
+	"""
+	def __init__(self, **args):
+		self._initialize(**args)
+
+	def _initialize(self, **args):
+
+		if 'fname' in args:
+			self._fname = args['fname']
 
 		if 'vtk_type' in args:
 			self._vtk = args['vtk_type']
@@ -499,9 +508,12 @@ class Mesh(SubSystem):
 			try:
 				self._reader = vtk.vtkUnstructuredGridReader()
 			except:
-				self._reader = vtk.vtkUnstructuredGridReader()			
+				self._reader = vtk.vtkUnstructuredGridReader()
 
-		super(Mesh, self).__init__(fname=fname, **args)
+		super(Mesh, self)._initialize(**args)
+
+		if 'avgCellData' not in args:
+			args['avgCellData'] = False
 
 		# Assert mesh input filname is VTK
 		if not hasattr(self, '_mesh'):
@@ -614,7 +626,7 @@ class Mesh(SubSystem):
 		self._args['vtk_type'] = self._vtk
 		self._args['fname'] = self._fname
 
-		self.__init__(**self._args) # it's imp to pass args so that any subsystem-specific args are
+		self._initialize(**self._args) # it's imp to pass args so that any subsystem-specific args are
 		# passed along to the next frame (e.g. vtk_type, etc.)
 		self._constructAttributes()
 
@@ -652,14 +664,12 @@ class Mesh(SubSystem):
 		return frame + 1
 
 	def _resetSubSystem(self):
-
-		self.__init__(**self._args)
+		self._initialize(**self._iargs)
 		super(Mesh, self)._resetSubSystem()
 
 		return 0
 
 	def __del__(self):
-
 		SubSystem.__del__(self)
 
 class Particles(SubSystem):
@@ -667,13 +677,16 @@ class Particles(SubSystem):
 	these properties. This class is iterable but NOT an iterator. """
 
 	def __init__(self, **args):
+		self._initialize(**args)
+
+	def _initialize(self, **args):
 
 		if 'sel' in args:
 			sel = args['sel']
 		else:
 			sel = None
 
-		super(Particles, self).__init__(**args)
+		super(Particles, self)._initialize(**args)
 
 		if not hasattr(self, '_fp'): # Make sure a file is already not open
 			if hasattr(self, '_fname'):
@@ -771,14 +784,14 @@ class Particles(SubSystem):
 
 		# If we are updating (looping over traj) we wanna keep the id (ref) of the class constant
 		# (soft copy)
-		self.__init__(sel=None, units=self._units, fname=self._fname, **self.data)
+		self._initialize(sel=None, units=self._units, fname=self._fname, **self.data)
 		self._constructAttributes()
 
 	def _resetSubSystem(self):
-
-		self.__init__(**self._args)
+		""" Get Particles back to initial state
+		 """
+		self._initialize(**self._args)
 		super(Particles, self)._resetSubSystem()
-
 		return 0
 
 	def computeROG(self):
@@ -1115,14 +1128,14 @@ class Particles(SubSystem):
 
 		return 0
 
-	def _goto(self, iframe, frame):
+	def _goto(self, current_frame, go_frame):
 		""" This function assumes we're reading a non-const N trajectory.
 		"""
 
 		# find the right frame number
 		if self._singleFile:
 			# We must be reading a single particle trajectory file (i.e. not a mesh)
-			while frame < iframe or iframe == -1:
+			while current_frame < go_frame or go_frame == -1:
 
 				line = self._fp.readline()
 
@@ -1136,40 +1149,39 @@ class Particles(SubSystem):
 
 			# assert self.frame == frame else something's wrong
 			# or the user wants to go to the last frame
-			if iframe == frame:
+			if frame == go_frame:
 
-				ts = int(self._fp.readline())
-				self.data['timestep'] = ts
-				self._constructAttributes()
+				#ts = int(self._fp.readline())
+				#self.data['timestep'] = ts
+				#self._constructAttributes()
 
-				self._readFile(frame)
+				self._readFile(go_frame)
 
-			elif iframe == -1:
+			elif go_frame == -1:
 				tmp = frame
 				frame = 0
 
 				# why delete _fp? it creates problems in lines 1288 del self._fp
-				self._readFile(0)
-				return self._goto(tmp, 1)
-
+				self._readFile(frame)
+				return self._goto(frame, tmp) # why do this?!
 			else:
-				raise NameError('Cannot find frame {} in current trajectory'.format(frame))
+				raise ValueError('Cannot find frame {} in current trajectory'.format(frame))
 
 		else: # no need to find the input frame, just select the right file if available
 
 			if self._fp:
-				if iframe >= len(self._files):
-					print('Input frame exceeds max number of frames')
+				if go_frame >= len(self._files):
+					raise ValueError('Input frame exceeds max number of frames')
 				else:
-					if frame == iframe:
-						pass
+					if current_frame == go_frame:
+						frame = current_frame
 					else:
-						if iframe == -1:
+						if go_frame == -1:
 							frame = len(self._files) - 1
+						else:
+							frame = go_frame
 
-						self._fp.close()
-						self._fp = open(self._files[frame], 'r')
-						self._readDumpFile()
+						self._readFile(frame)
 
 		return frame
 
@@ -1549,40 +1561,42 @@ class System(object):
 
 		# nothing to do
 		if frame == self.frame:
-			return 0
+			return frame
 		else:
 			newFrame = None
 
 		# rewind if necessary (better than reading file backwards?)
 		if frame < self.frame and frame > 0:
-			self.rewind()
-			self.goto(frame)
+			self.frame = self.rewind()
+			newFrame = self.goto(frame)
 		elif frame == 0: # rewind
 			for ss in self.__dict__:
 				if isinstance(self.__dict__[ss], list):
 					for item in self.__dict__[ss]:
 						if hasattr(item, '_resetSubSystem'):
-							self.frame  = item._resetSubSystem()
+							newFrame  = item._resetSubSystem()
 
 				elif hasattr(self.__dict__[ss], '_resetSubSystem'):
-					self.frame  = self.__dict__[ss]._resetSubSystem()
+					newFrame  = self.__dict__[ss]._resetSubSystem()
 
 		else:
 			for ss in self.__dict__:
 				if isinstance(self.__dict__[ss], list):
 					for item in self.__dict__[ss]:
 						if hasattr(item, '_goto'):
-							newFrame = item._goto(self.frame, frame)
+							self.frame = item._goto(self.frame, frame)
 
 				elif hasattr(self.__dict__[ss], '_goto'):
-					newFrame = self.__dict__[ss]._goto(self.frame, frame)
-
-			if newFrame:
-				self.frame = newFrame
+					self.frame = self.__dict__[ss]._goto(self.frame, frame)
 
 			# Rewind already updates the system, so we call _updateSystem only if
 			# the frame is moving forward
 			self._updateSystem()
+
+		if newFrame:
+			self.frame = newFrame
+
+		return self.frame
 
 	def skip(self):
 		""" Skips all empty frames i.e. moves the trajectory to the 1st frame containing
@@ -1611,8 +1625,7 @@ class System(object):
 
 	def rewind(self):
 		"""Read trajectory from the beginning"""
-
-		self.goto(0)
+		return self.goto(0)
 
 	def __next__(self):
 		"""Forward one step to next frame when using the next builtin function."""
