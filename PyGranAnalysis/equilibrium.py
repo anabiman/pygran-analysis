@@ -113,8 +113,8 @@ class Neighbors(object):
 		[type1]: which type to compute 1st coon for in a binay mixture
 		[type2]:  which type to compute 2nd coon for in a binay mixture
 
-		TODO: support multi-body entities for single component systems
-		TODO: support tertiary systems 
+		.. todo:: support multi-body entities for single component systems
+		.. todo:: support tertiary systems 
 
 		Returns an array of coon for all particles of size natoms x ntypes
 		"""
