@@ -1539,7 +1539,7 @@ class System(object):
 		return self
 
 	def units(self, iunits=None):
-		""" Change unit system to units ore return units if None
+		""" Change unit system to units or return units if None
 		units:  si, micro, cgs, or nano """
 
 		from .tools import conversion
@@ -1742,5 +1742,5 @@ def select(data, *region):
 
 		return indices
 
-	except:
+	except Exception:
 		raise
