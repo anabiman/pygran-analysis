@@ -1,5 +1,5 @@
 '''
-A module that provides the fundamental classes used in the analysis module
+A submodule that provides the fundamental classes used in the analysis module
 
 Created on July 10, 2016
 
@@ -57,7 +57,7 @@ these properties. This class is iterable but NOT an iterator.
 	:param units: unit system
 	:type units: string 
 
-	:note: see `link <https://github.com/Andrew-AbiMansour/PyGranAnalysis/blob/master/PyGranAnalysis/tools.py>`_ for available unit systems
+	:note: See `code <https://github.com/Andrew-AbiMansour/PyGranAnalysis/blob/master/PyGranAnalysis/tools.py>`_ for available unit systems
 	"""
 
 	def __init__(self, **args):
@@ -1712,7 +1712,7 @@ def select(data, *region):
 	
 	.. todo:: Make this function more generic and compliant with the rest of this module
 
-	.. note:: when region is not supplied, all particle indices are returned
+	.. note:: When region is not supplied, all particle indices are returned
 	"""
 
 	try:
