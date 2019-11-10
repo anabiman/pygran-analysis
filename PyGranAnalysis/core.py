@@ -442,7 +442,7 @@ these properties. This class is iterable but NOT an iterator.
 		self._constructAttributes()
 
 	def noise(self, sigma, attr=('x','y','z')):
-		""" Adds white noise of standard deviation `sigma' to all elements with attribute 'attr'.
+		""" Adds white noise of standard deviation 'sigma' to all elements with attribute 'attr'.
 
 		@sigma: standard deviation of the Gaussian (white) noise
 		@[attr]: attribute to perturb (positions by default)
@@ -848,21 +848,14 @@ class Particles(SubSystem):
 		to compensate for edge effects.  If no such particles exist, an error is
 		returned.  Try a smaller rMax...or write some code to handle edge effects! ;)
 
-		Arguments:
+		:param dr: increment for increasing radius of spherical shell
+		:type dr: float
 
-			S               length of each side of the cube in space
-			rMax            outer diameter of largest spherical shell
-			dr              increment for increasing radius of spherical shell
-		Implicit arguments:
-			x               an array of x positions of centers of particles
-			y               an array of y positions of centers of particles
-			z               an array of z positions of centers of particles
+		:param rMax: outer diameter of largest spherical shell
+		:type rMax: float
 
-		Returns a tuple: (g, radii, interior_indices)
-			g(r)            a numpy array containing the correlation function g(r)
-			radii           a numpy array containing the radii of the
-							spherical shells used to compute g(r)
-			reference_indices   indices of reference particles
+		:return: (rdf as numpy array, radii of spherical shells as numpy array, indices of particles)
+		:rtype: tuple
 		"""
 
 		if not (self.natoms > 0):
@@ -1510,8 +1503,6 @@ class System(object):
 
 	.. note:: This class is an iterator that enables time stepping: when looping over System (storing a traj file), 
 	the frame is controlled only by System through methods defined in a SubSystem sublass (read/write functions).
-
-	
 	"""
 
 	def __init__(self, **args):
