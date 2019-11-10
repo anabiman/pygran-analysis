@@ -1140,9 +1140,9 @@ class Particles(SubSystem):
 
 				line = self._fp.readline()
 
-				if not line and iframe >= 0:
+				if not line and go_frame >= 0:
 					raise StopIteration('End of file reached.')
-				elif not line and iframe == -1:
+				elif not line and go_frame == -1:
 					break
 
 				if line.find('TIMESTEP') >= 0:
