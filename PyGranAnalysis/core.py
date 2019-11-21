@@ -818,14 +818,6 @@ class Particles(SubSystem):
 
 		return np.array([np.dot(self.x, vol), np.dot(self.y, vol), np.dot(self.z, vol)]) / vol.sum()
 
-	def computeGCOM(self):
-		""" Returns the geometric center of mass """
-		vol = 4.0/3.0 * np.pi * self.radius**3
-		r = len(vol)
-
-		return np.array([(self.x * vol)**r, (self.y, vol)**r, (self.z, vol)**r]).sum(axis=1) / vol.sum()
-
-
 	def computeRadius(self, N=100):
 		""" Computes the maximum radius of an N-particle (spherical) system
 		by sorting the radial components and returning the average of the sqrt
@@ -954,26 +946,34 @@ class Particles(SubSystem):
 
 		I = sigma_a**2 / (mean_a (1 - mean_a))
 
-		@[resol]: bin size for grid construction (default 3 * diameter)
-		returns scalar intensity 
+		:param resol: bin size for grid construction (default 3 * diameter)
+		:type resol: float
+
+		:return: intensity
+		:rtype: float 
 		"""
 
 		if not resol:
 			resol = self.radius.min() * 3
 
-		if len(np.unique(self.type)) != 2:
+		if hasattr(self, 'types'):
+			ptypes = self.types
+		else:
+			ptypes = np.ones(self.natoms)
+
+		if len(np.unique(ptypes)) != 2:
 			raise ValueError("Intensity of segergation can be computed only for a binary system.")
 			# should I support tertiary systems or more ???
-
+		
 		nx = int((self.x.max() - self.x.min()) / resol) + 1
 		ny = int((self.y.max() - self.y.min()) / resol) + 1
 		nz = int((self.z.max() - self.z.min()) / resol) + 1
 
 		indices = np.zeros((nx,ny,nz), dtype='float64')
 
-		for sn, ctype in enumerate(np.unique(self.type)):
+		for sn, ctype in enumerate(np.unique(ptypes)):
 
-			parts = self[self.type==ctype]
+			parts = self[ptypes==ctype]
 
 			parts.translate(value=(-parts.x.min(), -parts.y.min(), -parts.z.min()), attr=('x','y','z'))
 
@@ -1010,7 +1010,7 @@ class Particles(SubSystem):
 		if not resol:
 			resol = self.radius.min()
 
-		_, a, total = self.intensitySegregation(resol)
+		_, a, total = self.computeIntensitySegregation(resol)
 
 		if not maxDist:
 			maxDim = max(a.shape)
@@ -1058,7 +1058,7 @@ class Particles(SubSystem):
 
 		return self.computeMass(tdensity).sum() / self.computeVolume(shape)
 
-	def computeDensityLocal(self, bdensity, dr, axis):
+	def computeDensityLocal(self, tdensity, dr, axis):
 		"""" Computes a localized density at a series of discretized regions of thickness 'dr'
 		along an axis specified by the user """
 
@@ -1078,11 +1078,11 @@ class Particles(SubSystem):
 			parts = self[r <= thick[i+1]]
 
 			if axis == 'x':
-				denLoc = parts[parts.x >= thick[i]].density(bdensity)
+				denLoc = parts[parts.x >= thick[i]].computeDensity(tdensity)
 			elif axis == 'y':
-				denLoc = parts[parts.y >= thick[i]].density(bdensity)
+				denLoc = parts[parts.y >= thick[i]].computeDensity(tdensity)
 			elif axis == 'z':
-				denLoc = parts[parts.z >= thick[i]].density(bdensity)
+				denLoc = parts[parts.z >= thick[i]].computeDensity(tdensity)
 
 			odensity.append( denLoc )
 
