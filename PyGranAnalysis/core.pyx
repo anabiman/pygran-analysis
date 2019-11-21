@@ -1139,27 +1139,28 @@ class Particles(SubSystem):
 					break
 
 				if line.find('TIMESTEP') >= 0:
-					frame += 1
+					current_frame += 1
 
 			# assert self.frame == frame else something's wrong
 			# or the user wants to go to the last frame
-			if frame == go_frame:
+			if current_frame == go_frame:
 
 				#ts = int(self._fp.readline())
 				#self.data['timestep'] = ts
 				#self._constructAttributes()
 
 				self._readFile(go_frame)
+				return go_frame
 
 			elif go_frame == -1:
-				tmp = frame
+				tmp = current_frame
 				frame = 0
 
-				# why delete _fp? it creates problems in lines 1288 del self._fp
+				del self._fp
 				self._readFile(frame)
-				return self._goto(frame, tmp) # why do this?!
+				return self._goto(frame+1, tmp) 
 			else:
-				raise ValueError('Cannot find frame {} in current trajectory'.format(frame))
+				raise ValueError('Cannot find frame {} in current trajectory'.format(current_frame))
 
 		else: # no need to find the input frame, just select the right file if available
 
@@ -1283,7 +1284,7 @@ class Particles(SubSystem):
 	def _readFile(self, frame):
 		""" Read a particle trajectory file 
 
-		TODO: Support skip for single dump file
+		.. todo:: Support skip for single dump file
 		"""
 
 		if 'skip' in self._args:
