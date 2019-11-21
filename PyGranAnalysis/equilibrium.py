@@ -36,7 +36,7 @@ from scipy.linalg import norm
 #from ..simulation.models import SpringDashpot
 
 class Neighbors(object):
-	""" A dynamic class that contains all the particle-particle (and optionally particle-wall)
+	""" A class that contains all the particle-particle (and optionally particle-wall)
 	neighbors from which contacts, overlaps, force chains, etc. can be determined.
 
 	:param Particles: collection of particle(s) to be analyzed
@@ -110,9 +110,12 @@ class Neighbors(object):
 		number arrays (tuple). For auto (self) coordination numbers, specify type1
 		and type2 accordingly.
 
-		[type1]: which type to compute 1st coon for in a binay mixture
-		[type2]:  which type to compute 2nd coon for in a binay mixture
+		:param type1: which type to compute 1st coon for in a binay mixture
+		:type type1: int
 
+		:param type2:  which type to compute 2nd coon for in a binay mixture
+		:type type2: int
+		
 		.. todo:: support multi-body entities for single component systems
 		.. todo:: support tertiary systems 
 
