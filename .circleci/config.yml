@@ -26,3 +26,12 @@ jobs:
           name: install PyGran.analysis
           command: |
             pip3 install . --user
+
+      - run:
+          name: run tests
+          command: |
+            python3 -m pytest --cov  tests/pytest/test_analysis --trajf "DEM_flow/traj/particles*.dump"
+            python3 -m codecov
+
+      - store_test_results:
+          path: .
