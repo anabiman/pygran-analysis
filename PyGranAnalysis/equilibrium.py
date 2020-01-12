@@ -1,5 +1,5 @@
 '''
-This module provids static/structural methods of analysis.
+This module provides static/structural methods of analysis.
 
 Created on March 10, 2017
 
@@ -115,7 +115,7 @@ class Neighbors(object):
 
 		:param type2:  which type to compute 2nd coon for in a binay mixture
 		:type type2: int
-		
+
 		.. todo:: support multi-body entities for single component systems
 		.. todo:: support tertiary systems 
 
