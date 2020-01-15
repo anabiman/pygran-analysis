@@ -15,5 +15,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [1.0.1]
 ### Added
-
 - generator submodule from PyGran.simulation
+
+### Removed
+- Method computeGCOM() in analysis.core.py*
+- Attribute 'length' for Particles.molecule
