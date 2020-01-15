@@ -24,6 +24,6 @@
         If not, see http://www.gnu.org/licenses . See also top-level README
         and LICENSE files.
 '''
-__version__ = '1.1.0'
+__version__ = '1.0.1'
 __author__ = 'Andrew Abi-Mansour'
 __email__ = 'support@pygran.org'
