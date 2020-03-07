@@ -48,6 +48,9 @@ from .tools import convert
 from scipy.stats import binned_statistic
 import importlib
 import numbers
+from pathlib import Path
+
+_vtk_formats = ['.vtk', '.vtu', '.vtp']
 
 class SubSystem(object):
 	""" The SubSystem is an abstract class the implementation of which stores all DEM object properties and the methods that operate on \
@@ -108,6 +111,21 @@ these properties. This class is iterable but NOT an iterator.
 
 			if 'fname' in args:
 				self._fname = args['fname']
+
+			if Path(self._fname).suffix in _vtk_formats:
+				if 'vtk_type' in args:
+					self._vtk = args['vtk_type']
+				else:
+					self._vtk = 'polydata'
+
+				if self._vtk == 'polydata':
+					self._reader = vtk.vtkPolyDataReader()
+				elif self._vtk == 'ugrid':
+					self._reader = vtk.vtkUnstructuredGridReader()
+				elif self._vtk == 'xml_polydata':
+						self._reader = vtk.vtkXMLPolyDataReader()
+				else:
+					raise TypeError('File format {} not understood'.format(self._vtk))
 
 		if '__module__' in args:
 			self.__module__ = args['__module__']
@@ -492,24 +510,6 @@ class Mesh(SubSystem):
 		if 'fname' in args:
 			self._fname = args['fname']
 
-		if 'vtk_type' in args:
-			self._vtk = args['vtk_type']
-		else:
-			self._vtk = None
-
-		if self._vtk == 'poly':
-			# Try polydata otherwise unstructured reader ... need to make this better
-			# The try-except control makes self._vtk kinda useless, right?
-			try:
-				self._reader = vtk.vtkPolyDataReader()
-			except:
-				self._reader = vtk.vtkUnstructuredGridReader()
-		else:
-			try:
-				self._reader = vtk.vtkUnstructuredGridReader()
-			except:
-				self._reader = vtk.vtkUnstructuredGridReader()
-
 		super(Mesh, self)._initialize(**args)
 
 		if 'avgCellData' not in args:
@@ -691,9 +691,12 @@ class Particles(SubSystem):
 		if not hasattr(self, '_fp'): # Make sure a file is already not open
 			if hasattr(self, '_fname'):
 				if self._fname:
-					self._ftype = self._fname.split('.')[-1]
 
-					if self._ftype == 'dump': # need a better way to figure out this is a LIGGGHTS/LAMMPS file
+					self._ftype = Path(self._fname).suffix
+					# Do some checking here on the traj extension to make sure
+					# it's supported
+
+					if self._ftype == '.dump' or self._ftype == '.data' or self._ftype == '.lammps': # need a better way to figure out this is a LIGGGHTS/LAMMPS file
 
 						if '*' in self._fname:
 							self._files = sorted(glob.glob(self._fname), key=numericalSort)
@@ -703,15 +706,8 @@ class Particles(SubSystem):
 
 						self._params = None
 
-						# Do some checking here on the traj extension to make sure
-						# it's supported
-						self._format = self._fname.split('.')[-1]
-
-						# Read 1st frame
-						self._readFile(0)
-
-					elif self._ftype == 'vtk':
-						if self._fname.split('.')[:-1][0].endswith('*'):
+					elif self._ftype in _vtk_formats:
+						if self._fname.split('.' + self._ftype)[0].endswith('*'):
 							self._files = sorted(glob.glob(self._fname), key=numericalSort)
 
 							for filen in self._files:
@@ -723,6 +719,9 @@ class Particles(SubSystem):
 							self._fp = open(self._fname, 'r')
 					else:
 						raise IOError('Input trajectory must be a valid LAMMPS/LIGGGHTS (dump) or vtk file.')
+
+					# Read 1st frame
+					self._readFile(0)
 
 		self._constructAttributes(sel)
 		self.data['natoms'] = len(self)
@@ -1158,6 +1157,101 @@ class Particles(SubSystem):
 
 		return frame
 
+	def write(self, filename):
+		""" Write a single output file """
+		ftype = filename.split('.')[-1]
+		if ftype == 'dump':
+			self._writeDumpFile(filename)
+		else:
+			raise NotImplementedError
+
+	def _writeDumpFile(self, filename):
+		""" Writes a single dump file"""
+		with  open(filename ,'a') as fp:
+
+			if 'timestep' not in self.data:
+				self.data['timestep'] = -1
+
+			if 'box' not in self.data:
+				maxR = self.data['radius'].max()
+				self.data['box'] = ([self.data['x'].min() - maxR, self.data['x'].max() + maxR], \
+									[self.data['y'].min() - maxR, self.data['y'].max() + maxR], \
+									[self.data['z'].min() - maxR, self.data['z'].max() + maxR], \
+									)
+
+			fp.write('ITEM: TIMESTEP\n{}\n'.format(self.data['timestep']))
+			fp.write('ITEM: NUMBER OF ATOMS\n{}\n'.format(self.data['natoms']))
+			fp.write('ITEM: BOX BOUNDS\n')
+			for box in self.data['box']:
+				fp.write('{} {}\n'.format(box[0], box[1]))
+
+			var = 'ITEM: ATOMS '
+			for key in self.data.keys():
+				if key != 'timestep' and key != 'natoms' and key != 'box':
+					var = var + '{} '.format(key)
+
+			fp.write(var)
+			fp.write('\n')
+
+			for i in range(self.data['natoms']):
+				var = ()
+				for key in self.data.keys():
+					if key != 'timestep' and key != 'natoms' and key != 'box':
+						if key == 'id':
+							var += (int(self.data[key][i]),)
+						else:
+							var += (self.data[key][i],)
+
+				nVars = len(var)
+				fp.write(('{} ' * nVars).format(*var))
+				fp.write('\n')
+
+	def _readVTKFile(self):
+
+		self._reader.SetFileName(self._fname)
+		self._reader.Update() # Needed if we need to call GetScalarRange
+		self._output = self._reader.GetOutput()
+
+		pos = vtk_to_numpy(self._output.GetPoints().GetData())
+		self.data['x'] = pos[:,0]
+
+		if pos.shape[1]  >= 1:
+			self.data['y'] = pos[:,1]
+
+		if pos.shape[1] >= 2:
+			self.data['z'] = pos[:,2]
+
+		index = 0
+		while True:
+			key = self._output.GetCellData().GetArrayName(index)
+			if key:
+				self.data[key] = vtk_to_numpy(self._output.GetCellData().GetArray(key))
+				index += 1
+			else:
+				break
+
+		index = 0
+		while True:
+			key = self._output.GetPointData().GetArrayName(index)
+			if key:
+				self.data[key] = vtk_to_numpy(self._output.GetPointData().GetArray(key))
+				index += 1
+			else:
+				break
+
+		# This doesnot work for 2D / 1D systems
+		for key in self.data.keys():
+			if isinstance(self.data[key], np.ndarray):
+				if len(self.data[key].shape) > 1:
+					if self.data[key].shape[1]  == 3:
+						self.data[key + 'x'] = self.data[key][:,0]
+						self.data[key + 'y'] = self.data[key][:,1]
+						self.data[key + 'z'] = self.data[key][:,2]
+
+						del self.data[key]
+
+		return 0 # how to return timestep?
+
 	def _readDumpFile(self):
 		""" Reads a single dump file"""
 		count = 0
@@ -1210,57 +1304,8 @@ class Particles(SubSystem):
 
 		return ts
 
-	def write(self, filename):
-		""" Write a single output file """
-		ftype = filename.split('.')[-1]
-		if ftype == 'dump':
-			self._writeDumpFile(filename)
-		else:
-			raise NotImplementedError
-
-	def _writeDumpFile(self, filename):
-		""" Writes a single dump file"""
-		with  open(filename ,'a') as fp:
-
-			if 'timestep' not in self.data:
-				self.data['timestep'] = -1
-
-			if 'box' not in self.data:
-				maxR = self.data['radius'].max()
-				self.data['box'] = ([self.data['x'].min() - maxR, self.data['x'].max() + maxR], \
-									[self.data['y'].min() - maxR, self.data['y'].max() + maxR], \
-									[self.data['z'].min() - maxR, self.data['z'].max() + maxR], \
-									)
-
-			fp.write('ITEM: TIMESTEP\n{}\n'.format(self.data['timestep']))
-			fp.write('ITEM: NUMBER OF ATOMS\n{}\n'.format(self.data['natoms']))
-			fp.write('ITEM: BOX BOUNDS\n')
-			for box in self.data['box']:
-				fp.write('{} {}\n'.format(box[0], box[1]))
-
-			var = 'ITEM: ATOMS '
-			for key in self.data.keys():
-				if key != 'timestep' and key != 'natoms' and key != 'box':
-					var = var + '{} '.format(key)
-
-			fp.write(var)
-			fp.write('\n')
-
-			for i in range(self.data['natoms']):
-				var = ()
-				for key in self.data.keys():
-					if key != 'timestep' and key != 'natoms' and key != 'box':
-						if key == 'id':
-							var += (int(self.data[key][i]),)
-						else:
-							var += (self.data[key][i],)
-
-				nVars = len(var)
-				fp.write(('{} ' * nVars).format(*var))
-				fp.write('\n')
-
 	def _readFile(self, frame):
-		""" Read a particle trajectory file 
+		""" Read a particle trajectory file.
 
 		.. todo:: Support skip for single dump file
 		"""
@@ -1282,14 +1327,17 @@ class Particles(SubSystem):
 				self._singleFile = True
 
 		if self._singleFile: # must support skip
-			if self._ftype == 'dump': 
+			if self._ftype == '.dump': 
 				ts = self._readDumpFile()
 				self.data['timestep'] = ts
+				self._constructAttributes()
+			elif self._ftype in _vtk_formats:
+				self._readVTKFile()
 				self._constructAttributes()
 			else:
 				raise IOError('{} format is not a supported trajectory file.'.format(self._ftype))
 		else:
-			if self._ftype == 'dump':
+			if self._ftype == '.dump':
 
 				if frame > len(self._files) - 1:
 					raise StopIteration
@@ -1300,7 +1348,7 @@ class Particles(SubSystem):
 				ts = self._readDumpFile()
 				self._constructAttributes()
 
-			elif self._ftype == 'vtk':
+			elif self._ftype in _vtk_formats:
 
 				if frame > len(self._files) - 1:
 					raise StopIteration
@@ -1308,50 +1356,7 @@ class Particles(SubSystem):
 				self._fp.close()
 				self._fname = self._files[frame + skip * frame]
 
-				self._reader = vtk.vtkPolyDataReader()
-
-				self._reader.SetFileName(self._fname)
-				self._reader.Update() # Needed if we need to call GetScalarRange
-				self._output = self._reader.GetOutput()
-
-				pos = vtk_to_numpy(self._output.GetPoints().GetData())
-				self.data['x'] = pos[:,0]
-
-				if pos.shape[1]  >= 1:
-					self.data['y'] = pos[:,1]
-
-				if pos.shape[1] >= 2:
-					self.data['z'] = pos[:,2]
-
-				index = 0
-				while True:
-					key = self._output.GetCellData().GetArrayName(index)
-					if key:
-						self.data[key] = vtk_to_numpy(self._output.GetCellData().GetArray(key))
-						index += 1
-					else:
-						break
-
-				index = 0
-				while True:
-					key = self._output.GetPointData().GetArrayName(index)
-					if key:
-						self.data[key] = vtk_to_numpy(self._output.GetPointData().GetArray(key))
-						index += 1
-					else:
-						break
-
-				# This doesnot work for 2D / 1D systems
-				for key in self.data.keys():
-					if isinstance(self.data[key], np.ndarray):
-						if len(self.data[key].shape) > 1:
-							if self.data[key].shape[1]  == 3:
-								self.data[key + 'x'] = self.data[key][:,0]
-								self.data[key + 'y'] = self.data[key][:,1]
-								self.data[key + 'z'] = self.data[key][:,2]
-
-								del self.data[key]
-
+				self._readVTKFile()
 				self._constructAttributes()
 
 		return frame + 1
@@ -1386,7 +1391,7 @@ class Factory(object):
 				# make sure selected class definition exists, otherwise, this had better be a list
 				raise ValueError('System takes only keywords of classes that are defined. Class type {} not found.'.format(args[ss]))
 
-			if isinstance(args[ss], list) or isinstance(args[ss], tuple): # we need to create a list of objects
+			if isinstance(args[ss], list): # we need to create a list of objects
 
 				objs = []
 
@@ -1406,7 +1411,7 @@ class Factory(object):
 					elif isinstance(item, sclass):
 						objs.append(item)
 					else:
-						raise ValueError('Incorrect keyarg supplied to System: {} when creating {} SubSystem'.format(item, ss))
+						raise ValueError('Incorrect keyword supplied to System: {} when creating {} SubSystem'.format(item, ss))
 
 				if objs:
 					obj.append([ss, objs])
@@ -1421,7 +1426,7 @@ class Factory(object):
 				obj_fname, obj_args = args[ss]
 				obj.append([ss, sclass(fname=obj_fname, **obj_args)])
 
-			elif isinstance(args[ss], sclass):
+			elif isinstance(args[ss], sclass): # copy constructor
 				obj.append([ss, args[ss]])
 			else:
 				raise ValueError('Incorrect keyarg supplied to System: {} when creating {} SubSystem'.format(args[ss], ss))

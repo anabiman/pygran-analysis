@@ -13,9 +13,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - CircleCI config for continuous integration
 - Added License file
 
-## [1.0.1]
+## [1.1.0]
 ### Added
-- generator submodule from PyGran.simulation
+- Submodule 'generator' from PyGran.simulation
+- Support for VTK file formats: vtp + vtu
 
 ### Removed
 - Method computeGCOM() in analysis.core.py*
