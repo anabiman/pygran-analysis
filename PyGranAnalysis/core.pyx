@@ -30,6 +30,7 @@ and LICENSE files.
 '''
 
 import numpy as np
+cimport numpy as np
 
 import types
 from random import choice
