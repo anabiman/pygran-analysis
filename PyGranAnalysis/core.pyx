@@ -113,20 +113,21 @@ these properties. This class is iterable but NOT an iterator.
 			if 'fname' in args:
 				self._fname = args['fname']
 
-			if Path(self._fname).suffix in _vtk_formats:
-				if 'vtk_type' in args:
-					self._vtk = args['vtk_type']
-				else:
-					self._vtk = 'polydata'
+			if self._fname:
+				if Path(self._fname).suffix in _vtk_formats:
+					if 'vtk_type' in args:
+						self._vtk = args['vtk_type']
+					else:
+						self._vtk = 'polydata'
 
-				if self._vtk == 'polydata':
-					self._reader = vtk.vtkPolyDataReader()
-				elif self._vtk == 'ugrid':
-					self._reader = vtk.vtkUnstructuredGridReader()
-				elif self._vtk == 'xml_polydata':
-						self._reader = vtk.vtkXMLPolyDataReader()
-				else:
-					raise TypeError('File format {} not understood'.format(self._vtk))
+					if self._vtk == 'polydata':
+						self._reader = vtk.vtkPolyDataReader()
+					elif self._vtk == 'ugrid':
+						self._reader = vtk.vtkUnstructuredGridReader()
+					elif self._vtk == 'xml_polydata':
+							self._reader = vtk.vtkXMLPolyDataReader()
+					else:
+						raise TypeError('File format {} not understood'.format(self._vtk))
 
 		if '__module__' in args:
 			self.__module__ = args['__module__']
@@ -878,7 +879,7 @@ class Particles(SubSystem):
 			index = interior_indices[p]
 			d = np.sqrt((x[index] - x)**2 + (y[index] - y)**2 + (z[index] - z)**2)
 			d[index] = 2.0 * rMax
-			(result, bins) = np.histogram(d, bins=edges, normed=False)
+			(result, bins) = np.histogram(d, bins=edges)
 			g[p,:] = result
 
 		# Average g(r) for all interior particles and compute radii
