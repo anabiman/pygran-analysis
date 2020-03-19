@@ -865,7 +865,7 @@ class Particles(SubSystem):
 		num_interior_particles = len(interior_indices)
 
 		if num_interior_particles < 1:
-			raise  RuntimeError ("No particles found for which a sphere of radius rMax will lie entirely within a cube of side length S.  Decrease rMax or increase the size of the cube.")
+			raise  RuntimeError ("No particles found for which a sphere of radius rMax will lie entirely within a cube of side length {}.  Decrease rMax or increase the size of the cube.".format(S))
 
 		edges = np.arange(0., rMax + 1.1 * dr, dr)
 		num_increments = len(edges) - 1
@@ -878,7 +878,7 @@ class Particles(SubSystem):
 			index = interior_indices[p]
 			d = np.sqrt((x[index] - x)**2 + (y[index] - y)**2 + (z[index] - z)**2)
 			d[index] = 2.0 * rMax
-			(result, bins) = np.histogram(d, bins=edges)
+			(result, bins) = np.histogram(d, bins=edges, normed=False)
 			g[p,:] = result
 
 		# Average g(r) for all interior particles and compute radii
