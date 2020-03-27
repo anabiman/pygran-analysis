@@ -29,7 +29,6 @@ If not, see http://www.gnu.org/licenses . See also top-level README
 and LICENSE files.
 '''
 
-import numpy as np
 cimport numpy as np
 
 import types
@@ -812,7 +811,7 @@ class Particles(SubSystem):
 
 		return np.sqrt(r[-N:]).mean()
 
-	def computeRDF(self, dr = None, center = True, rMax=None):
+	def computeRDF(self, dr = None, center = True, rMax=None, npts=100):
 		""" Computes the three-dimensional radial distribution function for a set of
 		spherical particles contained in a cube with side length S.  This simple
 		function finds reference particles such that a sphere of radius rMax drawn
@@ -825,6 +824,9 @@ class Particles(SubSystem):
 
 		:param rMax: outer diameter of largest spherical shell
 		:type rMax: float
+
+		:param npts: number of discretized points that form the shells. If dr is set, npts is ignored.
+		:type npts: int 
 
 		:return: (rdf as numpy array, radii of spherical shells as numpy array, indices of particles)
 		:rtype: tuple
@@ -847,7 +849,7 @@ class Particles(SubSystem):
 			rMax = S / 2.0
 
 		if dr is None:
-			dr = rMax / 100
+			dr = rMax / npts
 
 		# Find particles which are close enough to the cube center that a sphere of radius
 		# rMax will not cross any face of the cube
