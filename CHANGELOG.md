@@ -18,6 +18,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Submodule 'generator' from PyGran.simulation
 - Support for VTK file formats: vtp + vtu
 
+### Changed
+- Method computeRDF() in core.py*: added optional 'npts' arg
+- Function hcp() in generator.py: added optional 'units' arg
+
 ### Removed
-- Method computeGCOM() in analysis.core.py*
+- Method computeGCOM() in core.py*
 - Attribute 'length' for Particles.molecule
