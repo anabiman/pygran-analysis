@@ -100,7 +100,7 @@ def rand(natoms, radius, overlapping=True, factor=1.0):
 	else:
 		return core.Particles(**data)
 
-def hcp(natoms, radius):
+def hcp(natoms, radius, units='si'):
 	""" Generates a Hexagonal Close Packed structure
 		
 	:param natoms: number of particles to create
@@ -126,4 +126,4 @@ def hcp(natoms, radius):
 
 	data['radius'] = numpy.ones(natoms) * radius
 
-	return core.Particles(**data)
+	return core.Particles(data=data, units=units)
