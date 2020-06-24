@@ -25,3 +25,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Removed
 - Method computeGCOM() in core.py*
 - Attribute 'length' for Particles.molecule
+
+## [1.1.1]
+### Changed
+- Fixed bug with computeIntensitySegregation: 'self.types' typo
