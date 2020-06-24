@@ -938,8 +938,8 @@ class Particles(SubSystem):
 		if not resol:
 			resol = self.radius.min() * 3
 
-		if hasattr(self, 'types'):
-			ptypes = self.types
+		if hasattr(self, 'type'):
+			ptypes = self.type
 		else:
 			ptypes = np.ones(self.natoms)
 

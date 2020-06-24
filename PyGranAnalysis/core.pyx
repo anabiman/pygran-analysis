@@ -29,6 +29,7 @@ If not, see http://www.gnu.org/licenses . See also top-level README
 and LICENSE files.
 '''
 
+import numpy as np
 cimport numpy as np
 
 import types
@@ -938,8 +939,8 @@ class Particles(SubSystem):
 		if not resol:
 			resol = self.radius.min() * 3
 
-		if hasattr(self, 'types'):
-			ptypes = self.types
+		if hasattr(self, 'type'):
+			ptypes = self.type
 		else:
 			ptypes = np.ones(self.natoms)
 
