@@ -1,4 +1,4 @@
-'''
+"""
 This module provides classes for time-dependent analysis.
 
 Created on July 11, 2016
@@ -27,18 +27,19 @@ of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. You should have
 received a copy of the GNU General Public License along with PyGran.
 If not, see http://www.gnu.org/licenses . See also top-level README
 and LICENSE files.
-'''
+"""
 
 import numpy
 
+
 class Temporal(object):
-	""" A generic class that enables time-dependent analysis of DEM data """
+    """ A generic class that enables time-dependent analysis of DEM data """
 
-	def __init__(self, System):
-		self.System = System
+    def __init__(self, System):
+        self.System = System
 
-	def series(self, attr):
-		"""
+    def series(self, attr):
+        """
 		Extracts a time series for a supplied *attr* stored in self.System
 
 		:param attr: attribute to extract time series for
@@ -46,19 +47,19 @@ class Temporal(object):
 		:return: time series
 		:rtype: numpy array of dimensions nframes x dim_attr
 		"""
-		out = []
-		self.System.rewind()
+        out = []
+        self.System.rewind()
 
-		for ts in self.System:
-			if attr in self.System.Particles.data:
-				out.append(self.System.Particles.__getattribute__(attr))
+        for ts in self.System:
+            if attr in self.System.Particles.data:
+                out.append(self.System.Particles.__getattribute__(attr))
 
-		self.System.rewind()
+        self.System.rewind()
 
-		return numpy.array(out)
-		
-	def flow(self, density=None, dt=1):
-		"""
+        return numpy.array(out)
+
+    def flow(self, density=None, dt=1):
+        """
 		Computes flow rate. When *density* is supplied, the computed rate is the mass per unit of time, otherwise it is the number of particles per unit of time.
 
 		:param density: true mass density
@@ -72,29 +73,38 @@ class Temporal(object):
 			Make this routine more efficient
 		"""
 
-		self.System.rewind()
+        self.System.rewind()
 
-		N0 = self.System.Particles.natoms
-		t0 = self.System.Particles.timestep
+        N0 = self.System.Particles.natoms
+        t0 = self.System.Particles.timestep
 
-		mass = []
+        mass = []
 
-		count = 0
+        count = 0
 
-		for ts in self.System:
-			
-			if self.System.Particles.natoms:
+        for ts in self.System:
 
-				time = (self.System.Particles.timestep - t0) * dt
-				mass.append( numpy.sum(- density * 4.0 / 3.0 * numpy.pi * (self.System.Particles.natoms - N0) * (self.System.Particles.radius**3.0) / time) )
-				
-		self.System.rewind()
+            if self.System.Particles.natoms:
 
-		return numpy.array(mass)
+                time = (self.System.Particles.timestep - t0) * dt
+                mass.append(
+                    numpy.sum(
+                        -density
+                        * 4.0
+                        / 3.0
+                        * numpy.pi
+                        * (self.System.Particles.natoms - N0)
+                        * (self.System.Particles.radius ** 3.0)
+                        / time
+                    )
+                )
 
+        self.System.rewind()
 
-	def wallCollision(self, **boundary):
-		"""
+        return numpy.array(mass)
+
+    def wallCollision(self, **boundary):
+        """
 		Computes the frequency of particle-wall collisions
 
 		:param xmin: bound that specifies the left-hand wall pependicular to the y-z plane
@@ -115,27 +125,41 @@ class Temporal(object):
 		.. note:: This routines supports only 3D systems
 		"""
 
-		if not boundary:
-			raise ValueError("Bounding walls must be specified with xmin, xmax, ... zmax.")
+        if not boundary:
+            raise ValueError(
+                "Bounding walls must be specified with xmin, xmax, ... zmax."
+            )
 
-		collisions = 0
+        collisions = 0
 
-		if 'xmin' in boundary:
-			collisions += len(self.System.Particles.x - self.System.radius <= boundary['xmin'])
+        if "xmin" in boundary:
+            collisions += len(
+                self.System.Particles.x - self.System.radius <= boundary["xmin"]
+            )
 
-		if 'xmax' in boundary:
-			collisions += len(self.System.Particles.x - self.System.radius >= boundary['xmax'])
+        if "xmax" in boundary:
+            collisions += len(
+                self.System.Particles.x - self.System.radius >= boundary["xmax"]
+            )
 
-		if 'ymin' in boundary:
-			collisions += len(self.System.Particles.y - self.System.radius <= boundary['ymin'])
+        if "ymin" in boundary:
+            collisions += len(
+                self.System.Particles.y - self.System.radius <= boundary["ymin"]
+            )
 
-		if 'ymax' in boundary:
-			collisions += len(self.System.Particles.y - self.System.radius >= boundary['ymax'])
+        if "ymax" in boundary:
+            collisions += len(
+                self.System.Particles.y - self.System.radius >= boundary["ymax"]
+            )
 
-		if 'zmin' in boundary:
-			collisions += len(self.System.Particles.z - self.System.radius <= boundary['zmin'])
+        if "zmin" in boundary:
+            collisions += len(
+                self.System.Particles.z - self.System.radius <= boundary["zmin"]
+            )
 
-		if 'zmax' in boundary:
-			collisions += len(self.System.Particles.z - self.System.radius >= boundary['zmax'])
+        if "zmax" in boundary:
+            collisions += len(
+                self.System.Particles.z - self.System.radius >= boundary["zmax"]
+            )
 
-		return collisions
+        return collisions

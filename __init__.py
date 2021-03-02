@@ -1,4 +1,4 @@
-'''
+"""
 A module that acts as a wrapper for all analysis objects
 
 Created on October 08, 2019
@@ -27,6 +27,6 @@ of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. You should have
 received a copy of the GNU General Public License along with PyGran.
 If not, see http://www.gnu.org/licenses . See also top-level README
 and LICENS
-'''
+"""
 
 from .PyGranAnalysis import *

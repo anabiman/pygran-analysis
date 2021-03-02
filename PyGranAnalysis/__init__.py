@@ -1,4 +1,4 @@
-'''
+"""
 Created on Apil 25, 2016
 Author: Andrew Abi-Mansour
 
@@ -24,7 +24,7 @@ of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. You should have
 received a copy of the GNU General Public License along with PyGran.
 If not, see http://www.gnu.org/licenses . See also top-level README
 and LICENSE files.
- '''
+ """
 
 from .core import *
 from ._version import __version__, __author__, __email__

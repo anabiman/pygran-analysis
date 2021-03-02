@@ -1,4 +1,4 @@
-'''
+"""
 A set of routines for generating particle configurations
 
 Created on March 30, 2016
@@ -27,14 +27,15 @@ of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. You should have
 received a copy of the GNU General Public License along with PyGran.
 If not, see http://www.gnu.org/licenses . See also top-level README
 and LICENSE files.
-'''
+"""
 
 import numpy
 import collections
 from . import core, equilibrium
 
+
 def rand(natoms, radius, overlapping=True, factor=1.0):
-	""" Creates a set of randomly placed non-overlapping particles 
+    """ Creates a set of randomly placed non-overlapping particles 
 
 	:param natoms: number of particles to create
 	:type natoms: int
@@ -48,60 +49,67 @@ def rand(natoms, radius, overlapping=True, factor=1.0):
 	:rtype: Particles
 	"""
 
-	scale = 2.0 * natoms**(1.0/3)
+    scale = 2.0 * natoms ** (1.0 / 3)
 
-	x,y,z = numpy.random.rand(natoms) * radius * scale, numpy.random.rand(natoms) * radius * scale, numpy.random.rand(natoms) * radius * scale
+    x, y, z = (
+        numpy.random.rand(natoms) * radius * scale,
+        numpy.random.rand(natoms) * radius * scale,
+        numpy.random.rand(natoms) * radius * scale,
+    )
 
-	if type(radius) is float or type(radius) is int:
-		r = numpy.ones(natoms) * radius
-	elif len(r) == natoms:
-		r = radius
-	else:
-		raise ValueError('Input radius can be either a scalar (float or int) or a list/array of length natoms.')
+    if type(radius) is float or type(radius) is int:
+        r = numpy.ones(natoms) * radius
+    elif len(r) == natoms:
+        r = radius
+    else:
+        raise ValueError(
+            "Input radius can be either a scalar (float or int) or a list/array of length natoms."
+        )
 
-	data = collections.OrderedDict()
-	data['x'] = x
-	data['y'] = y
-	data['z'] = z
-	data['radius'] = r
-	
-	if not overlapping:
+    data = collections.OrderedDict()
+    data["x"] = x
+    data["y"] = y
+    data["z"] = z
+    data["radius"] = r
 
-		Particles = core.Particles(**data)
-		indices_tot = numpy.arange(len(Particles))
+    if not overlapping:
 
-		while(True):
-			
-			Neigh = equilibrium.Neighbors(Particles)
-		
-			if len(Neigh.overlaps):
-				indices = numpy.array(Neigh.overlaps[:,1:], 'int')
-				indices.reshape(len(indices)*2)
-				indices = numpy.unique(indices)
- 
-				Particles_overlap = Particles[indices]
+        Particles = core.Particles(**data)
+        indices_tot = numpy.arange(len(Particles))
 
-				# Find all particle indices not overlapping
-				# Is there a faster way to do this?
-				indices_rem = []
-				for i in indices_tot:
-					if i not in indices:
-						indices_rem.append(i)
+        while True:
 
-				Particles = Particles[indices_rem]
+            Neigh = equilibrium.Neighbors(Particles)
 
-				Particles_overlap.perturb(factor * Particles_overlap.radius)
+            if len(Neigh.overlaps):
+                indices = numpy.array(Neigh.overlaps[:, 1:], "int")
+                indices.reshape(len(indices) * 2)
+                indices = numpy.unique(indices)
 
-				Particles += Particles_overlap
-				
-			else:
-				return Particles
+                Particles_overlap = Particles[indices]
 
-	else:
-		return core.Particles(**data)
+                # Find all particle indices not overlapping
+                # Is there a faster way to do this?
+                indices_rem = []
+                for i in indices_tot:
+                    if i not in indices:
+                        indices_rem.append(i)
 
-def hcp(natoms, radius, units='si'):
-	""" Generates a Hexagonal Close Packed structure
+                Particles = Particles[indices_rem]
+
+                Particles_overlap.perturb(factor * Particles_overlap.radius)
+
+                Particles += Particles_overlap
+
+            else:
+                return Particles
+
+    else:
+        return core.Particles(**data)
+
+
+def hcp(natoms, radius, units="si"):
+    """ Generates a Hexagonal Close Packed structure
 		
 	:param natoms: number of particles to create
 	:type natoms: int
@@ -110,20 +118,26 @@ def hcp(natoms, radius, units='si'):
 	:returns: a new Particles object
 	:rtype: Particles
 	"""
-	data = collections.OrderedDict()
-	N = int(natoms**(1/3.0))
-	count = 0
+    data = collections.OrderedDict()
+    N = int(natoms ** (1 / 3.0))
+    count = 0
 
-	data['x'], data['y'], data['z'] = numpy.zeros(natoms), numpy.zeros(natoms), numpy.zeros(natoms)
+    data["x"], data["y"], data["z"] = (
+        numpy.zeros(natoms),
+        numpy.zeros(natoms),
+        numpy.zeros(natoms),
+    )
 
-	for i in range(N):
-		for j in range(N):
-			for k in range(N):
-				data['x'][count] = (2.0 * i + ((j + k) % 2)) * radius
-				data['y'][count] = (numpy.sqrt(3.) * (j + 1.0/3.0 * (k % 2))) * radius
-				data['z'][count] = (2.0 * numpy.sqrt(6.0) / 3.0 * k) * radius
-				count += 1
+    for i in range(N):
+        for j in range(N):
+            for k in range(N):
+                data["x"][count] = (2.0 * i + ((j + k) % 2)) * radius
+                data["y"][count] = (
+                    numpy.sqrt(3.0) * (j + 1.0 / 3.0 * (k % 2))
+                ) * radius
+                data["z"][count] = (2.0 * numpy.sqrt(6.0) / 3.0 * k) * radius
+                count += 1
 
-	data['radius'] = numpy.ones(natoms) * radius
+    data["radius"] = numpy.ones(natoms) * radius
 
-	return core.Particles(data=data, units=units)
+    return core.Particles(data=data, units=units)
