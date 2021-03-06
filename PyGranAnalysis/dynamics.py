@@ -40,13 +40,13 @@ class Temporal(object):
 
     def series(self, attr):
         """
-		Extracts a time series for a supplied *attr* stored in self.System
+        Extracts a time series for a supplied *attr* stored in self.System
 
-		:param attr: attribute to extract time series for
-		:type attr: string
-		:return: time series
-		:rtype: numpy array of dimensions nframes x dim_attr
-		"""
+        :param attr: attribute to extract time series for
+        :type attr: string
+        :return: time series
+        :rtype: numpy array of dimensions nframes x dim_attr
+        """
         out = []
         self.System.rewind()
 
@@ -60,18 +60,18 @@ class Temporal(object):
 
     def flow(self, density=None, dt=1):
         """
-		Computes flow rate. When *density* is supplied, the computed rate is the mass per unit of time, otherwise it is the number of particles per unit of time.
+        Computes flow rate. When *density* is supplied, the computed rate is the mass per unit of time, otherwise it is the number of particles per unit of time.
 
-		:param density: true mass density
-		:type density: float 
-		:param dt: timestep in units of time, default 1.
-		:type dt: float
-		:return: flow rate
-		:rtype: 1D numpy array
+        :param density: true mass density
+        :type density: float
+        :param dt: timestep in units of time, default 1.
+        :type dt: float
+        :return: flow rate
+        :rtype: 1D numpy array
 
-		.. todo:: 
-			Make this routine more efficient
-		"""
+        .. todo::
+                Make this routine more efficient
+        """
 
         self.System.rewind()
 
@@ -105,25 +105,25 @@ class Temporal(object):
 
     def wallCollision(self, **boundary):
         """
-		Computes the frequency of particle-wall collisions
+        Computes the frequency of particle-wall collisions
 
-		:param xmin: bound that specifies the left-hand wall pependicular to the y-z plane
-		:type xmin: float
-		:param xmax: bound that specifies the right-hand wall pependicular to the y-z plane
-		:type xmax: float
-		:param ymin: bound that specifies the right-hand wall pependicular to the x-z plane
-		:type ymin: float
-		:param ymax: bound that specifies the right-hand wall pependicular to the x-z plane
-		:type ymax: float
-		:param zmin: bound that specifies the right-hand wall pependicular to the x-y plane
-		:type zmin: float
-		:param zmax: bound that specifies the right-hand wall pependicular to the x-y plane
-		:type zmax: float
-		:return: wall collision frequency
-		:rtype: float
+        :param xmin: bound that specifies the left-hand wall pependicular to the y-z plane
+        :type xmin: float
+        :param xmax: bound that specifies the right-hand wall pependicular to the y-z plane
+        :type xmax: float
+        :param ymin: bound that specifies the right-hand wall pependicular to the x-z plane
+        :type ymin: float
+        :param ymax: bound that specifies the right-hand wall pependicular to the x-z plane
+        :type ymax: float
+        :param zmin: bound that specifies the right-hand wall pependicular to the x-y plane
+        :type zmin: float
+        :param zmax: bound that specifies the right-hand wall pependicular to the x-y plane
+        :type zmax: float
+        :return: wall collision frequency
+        :rtype: float
 
-		.. note:: This routines supports only 3D systems
-		"""
+        .. note:: This routines supports only 3D systems
+        """
 
         if not boundary:
             raise ValueError(

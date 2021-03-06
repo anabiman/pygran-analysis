@@ -47,17 +47,17 @@ conversion = {
 
 
 def convert(unitso, unitsf):
-    """ Generic function that converts length/time/mass from one unit system to another
+    """Generic function that converts length/time/mass from one unit system to another
 
-	:param unitso: unit system to convert from
-	:type unitso: str
+    :param unitso: unit system to convert from
+    :type unitso: str
 
-	:param unitsf: unit system to convert to
-	:type unitsf: str
+    :param unitsf: unit system to convert to
+    :type unitsf: str
 
-	:return: new unit system
-	:rtype: dict
-	"""
+    :return: new unit system
+    :rtype: dict
+    """
 
     if unitso in conversion:
         if unitsf in conversion:
@@ -74,17 +74,17 @@ def convert(unitso, unitsf):
 
 
 def find(fname, path):
-    """ Finds a filename (fname) along the path `path' 
+    """Finds a filename (fname) along the path `path'
 
-	:param fname: filename
-	:type fname: str
+    :param fname: filename
+    :type fname: str
 
-	:param path: search path
-	:type path: str
+    :param path: search path
+    :type path: str
 
-	:return: absolute path of the fname if found, else None
-	:rtype: str/None
-	"""
+    :return: absolute path of the fname if found, else None
+    :rtype: str/None
+    """
     for root, dirs, files in os.walk(path):
         if fname in files:
             return os.path.join(root, fname)
@@ -93,14 +93,14 @@ def find(fname, path):
 
 
 def run(program):
-    """ Unix only: launches an executable program available in the PATH environment variable.
+    """Unix only: launches an executable program available in the PATH environment variable.
 
-	:param program: name of the executable to search for
-	:type program: str
+    :param program: name of the executable to search for
+    :type program: str
 
-	:return: 0 if successful and 1 otherwise
-	:rtype: bool
-	 """
+    :return: 0 if successful and 1 otherwise
+    :rtype: bool
+    """
     paths = os.environ["PATH"]
 
     for path in paths.split(":"):

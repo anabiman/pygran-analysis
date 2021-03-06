@@ -37,22 +37,22 @@ from scipy.linalg import norm
 
 
 class Neighbors(object):
-    """ A class that contains all the particle-particle (and optionally particle-wall)
-	neighbors from which contacts, overlaps, force chains, etc. can be determined.
+    """A class that contains all the particle-particle (and optionally particle-wall)
+    neighbors from which contacts, overlaps, force chains, etc. can be determined.
 
-	:param Particles: collection of particle(s) to be analyzed
-	:type Particles: SubSystem
+    :param Particles: collection of particle(s) to be analyzed
+    :type Particles: SubSystem
 
-	:param material: material parameters
-	:type material: dict
+    :param material: material parameters
+    :type material: dict
 
-	:param cutoff: max radius by default
-	:type cutoff: float
+    :param cutoff: max radius by default
+    :type cutoff: float
 
-	:param binary: False by default. Set to True when analyzing 2-component systems
-	:type binary: bool
+    :param binary: False by default. Set to True when analyzing 2-component systems
+    :type binary: bool
 
-	"""
+    """
 
     def __init__(self, Particles, material=None, cutoff=None, binary=False):
 
@@ -124,22 +124,22 @@ class Neighbors(object):
         return self._pairs
 
     def coon(self, type1=1, type2=2):
-        """ Computes the coordination number per particle. For binary mixtures
-		the default coordinations numbers are returned as two cross coordination 
-		number arrays (tuple). For auto (self) coordination numbers, specify type1
-		and type2 accordingly.
+        """Computes the coordination number per particle. For binary mixtures
+        the default coordinations numbers are returned as two cross coordination
+        number arrays (tuple). For auto (self) coordination numbers, specify type1
+        and type2 accordingly.
 
-		:param type1: which type to compute 1st coon for in a binay mixture
-		:type type1: int
+        :param type1: which type to compute 1st coon for in a binay mixture
+        :type type1: int
 
-		:param type2:  which type to compute 2nd coon for in a binay mixture
-		:type type2: int
+        :param type2:  which type to compute 2nd coon for in a binay mixture
+        :type type2: int
 
-		.. todo:: support multi-body entities for single component systems
-		.. todo:: support tertiary systems 
+        .. todo:: support multi-body entities for single component systems
+        .. todo:: support tertiary systems
 
-		Returns an array of coon for all particles of size natoms x ntypes
-		"""
+        Returns an array of coon for all particles of size natoms x ntypes
+        """
 
         if self._binary:
 
@@ -259,18 +259,18 @@ class Neighbors(object):
 
     @property
     def overlaps(self):
-        """ Returns all overlapping distances and their indices in the form of an N x 3 numpy array
-		where N is the number of particles. 1st column contains the distances, 2nd and 3rd colum the corresponding
-		indices """
+        """Returns all overlapping distances and their indices in the form of an N x 3 numpy array
+        where N is the number of particles. 1st column contains the distances, 2nd and 3rd colum the corresponding
+        indices"""
         return self._overlaps
 
     def filter(self, percent):
-        """ Returns a Particles object in which particles overlap no more than `percent' of their effective radius
+        """Returns a Particles object in which particles overlap no more than `percent' of their effective radius
 
-		@[percent]: filter all particles overlapping by a certain percentage.
+        @[percent]: filter all particles overlapping by a certain percentage.
 
-		Returns a new Particles class
-		"""
+        Returns a new Particles class
+        """
 
         percent /= 100.0
         indices = []
@@ -313,13 +313,13 @@ class Neighbors(object):
         peters=True,
         threshold=1,
     ):
-        """ Computes the force chain based on an algorithm published in Phys. Rev. E. 72, 041307 (2005):
-		'Characterization of force chains in granular material'.
+        """Computes the force chain based on an algorithm published in Phys. Rev. E. 72, 041307 (2005):
+        'Characterization of force chains in granular material'.
 
-		@ [axes]: a tuple of size 2 that specifies the two axes to use for computing the force chain, e.g. axes=(0,1) -> (x,y)
-		@ [alpha]: the angle (in radians) that controls the deviation of the force chain. A value of 0 means a perfectly linear chain.
-		Thus, alpha is a measure of the 'curvature' of the force chain. See page 5 of the paper cited above.
-		"""
+        @ [axes]: a tuple of size 2 that specifies the two axes to use for computing the force chain, e.g. axes=(0,1) -> (x,y)
+        @ [alpha]: the angle (in radians) that controls the deviation of the force chain. A value of 0 means a perfectly linear chain.
+        Thus, alpha is a measure of the 'curvature' of the force chain. See page 5 of the paper cited above.
+        """
 
         stress = numpy.zeros((self._Particles.natoms, 2, 2))
         stress_prin = numpy.zeros(

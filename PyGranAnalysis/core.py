@@ -67,8 +67,8 @@ these properties. This class is iterable but NOT an iterator.
         self._initilize(**args)
 
     def _initialize(self, **args):
-        """ This function exists mostly for convenience. It does everything expected from __init__ and is used by other methods 
-		such as _resetSubSystem """
+        """This function exists mostly for convenience. It does everything expected from __init__ and is used by other methods
+        such as _resetSubSystem"""
 
         self._units = "si"
         self._fname = None
@@ -156,7 +156,7 @@ these properties. This class is iterable but NOT an iterator.
 
     def _metaget(self, key):
         """A meta function for returning dynamic class attributes treated as lists (for easy slicing)
-		and return as numpy arrays for numerical computations / manipulations"""
+        and return as numpy arrays for numerical computations / manipulations"""
 
         if isinstance(self.data[key], np.ndarray):
             self.data[key].flags.writeable = False
@@ -236,7 +236,9 @@ these properties. This class is iterable but NOT an iterator.
 
         return cName(sel=sel, units=self._units, data=self.data.copy())
 
-    def __and__(self,):
+    def __and__(
+        self,
+    ):
         """ Boolean logical operator on particles """
 
     def copy(self):
@@ -252,9 +254,9 @@ these properties. This class is iterable but NOT an iterator.
         return eval(type(self).__name__)(units=self._units, data=data)
 
     def conversion(self, factors):
-        """ Convesion factors from S.I., micro, cgs, or nano, and vice versa 
+        """Convesion factors from S.I., micro, cgs, or nano, and vice versa
 
-		.. todo:: support all possible variables (is this possible???) """
+        .. todo:: support all possible variables (is this possible???)"""
 
         for key in self.data.keys():
 
@@ -305,8 +307,8 @@ these properties. This class is iterable but NOT an iterator.
                 pass
 
     def units(self, units=None):
-        """ Change unit system to units ore return units if None
-		units:  si, micro, cgs, or nano """
+        """Change unit system to units ore return units if None
+        units:  si, micro, cgs, or nano"""
 
         if not units:
             return self._units
@@ -328,8 +330,8 @@ these properties. This class is iterable but NOT an iterator.
         return self
 
     def __add__(self, obj):
-        """ Adds two classes together, or operates scalars/vectors on particle radii/positions
-		.. todo:: get this working with meshes."""
+        """Adds two classes together, or operates scalars/vectors on particle radii/positions
+        .. todo:: get this working with meshes."""
 
         data = collections.OrderedDict()
 
@@ -358,8 +360,8 @@ these properties. This class is iterable but NOT an iterator.
             )
 
     def __sub__(self, obj):
-        """ Subtracts scalars/vectors from particle radii/positions
-		.. todo:: get this working with meshes """
+        """Subtracts scalars/vectors from particle radii/positions
+        .. todo:: get this working with meshes"""
 
         if type(obj) is tuple:
             obj, att = obj
@@ -378,8 +380,8 @@ these properties. This class is iterable but NOT an iterator.
         return self
 
     def __mul__(self, obj):
-        """ Multiplies scalars/vectors from particle radii/positions
-		.. todo:: get this working with meshes """
+        """Multiplies scalars/vectors from particle radii/positions
+        .. todo:: get this working with meshes"""
 
         if type(obj) is not type(self):
             raise RuntimeError(
@@ -412,8 +414,8 @@ these properties. This class is iterable but NOT an iterator.
         return cName(sel=None, units=self._units, data=data)
 
     def __div__(self, obj):
-        """ Divides scalars/vectors from particle radii/positions
-		.. todo:: get this working with meshes """
+        """Divides scalars/vectors from particle radii/positions
+        .. todo:: get this working with meshes"""
 
         if type(obj) is tuple:
             obj, att = obj
@@ -432,9 +434,9 @@ these properties. This class is iterable but NOT an iterator.
         return self
 
     def __or__(self, att):
-        """ Returns a (temporary) new subsystem with only a single attribute. the user can of course make this not *temporary* but
-		that is not what should be used for. In principle, the modulus is a reductionist operator that serves as a temporary metastate
-		for binary operations. """
+        """Returns a (temporary) new subsystem with only a single attribute. the user can of course make this not *temporary* but
+        that is not what should be used for. In principle, the modulus is a reductionist operator that serves as a temporary metastate
+        for binary operations."""
 
         # Make a hard copy of the class to make sure we preserve its state
         obj = self.copy()
@@ -452,10 +454,10 @@ these properties. This class is iterable but NOT an iterator.
             yield self[i]
 
     def scale(self, value, attr=("x", "y", "z")):
-        """ Scales all ss elements by a float or int 'value'
+        """Scales all ss elements by a float or int 'value'
 
-		@[attr]: attribute to scale (positions by default)
-		"""
+        @[attr]: attribute to scale (positions by default)
+        """
         for at in attr:
             if at in self.data:
 
@@ -470,11 +472,11 @@ these properties. This class is iterable but NOT an iterator.
         self._constructAttributes()
 
     def translate(self, value, attr=("x", "y", "z")):
-        """ Translates all ss elements by a tuple of integers or floats
+        """Translates all ss elements by a tuple of integers or floats
 
-		@value: tuple of float or int by which to translate the system
-		@[attr]: tuple of attributes to translate system by (positions by default)
-		"""
+        @value: tuple of float or int by which to translate the system
+        @[attr]: tuple of attributes to translate system by (positions by default)
+        """
 
         if len(value) != len(attr):
             raise ValueError(
@@ -495,11 +497,11 @@ these properties. This class is iterable but NOT an iterator.
         self._constructAttributes()
 
     def noise(self, sigma, attr=("x", "y", "z")):
-        """ Adds white noise of standard deviation 'sigma' to all elements with attribute 'attr'.
+        """Adds white noise of standard deviation 'sigma' to all elements with attribute 'attr'.
 
-		@sigma: standard deviation of the Gaussian (white) noise
-		@[attr]: attribute to perturb (positions by default)
-		"""
+        @sigma: standard deviation of the Gaussian (white) noise
+        @[attr]: attribute to perturb (positions by default)
+        """
 
         if sigma < 0:
             raise ValueError("Standard deviation must be positive.")
@@ -532,13 +534,13 @@ these properties. This class is iterable but NOT an iterator.
 
 
 class Mesh(SubSystem):
-    """  The Mesh class stores a list of meshes and their associated attributes / methods.
-	This class is iterable but NOT an iterator.
+    """The Mesh class stores a list of meshes and their associated attributes / methods.
+    This class is iterable but NOT an iterator.
 
-	:param fname: mesh filename
-	:type fname: str
+    :param fname: mesh filename
+    :type fname: str
 
-	"""
+    """
 
     def __init__(self, **args):
         self._initialize(**args)
@@ -743,8 +745,8 @@ class Mesh(SubSystem):
 
 
 class Particles(SubSystem):
-    """ The Particle class stores all particle properties and the methods that operate on
-	these properties. This class is iterable but NOT an iterator. """
+    """The Particle class stores all particle properties and the methods that operate on
+    these properties. This class is iterable but NOT an iterator."""
 
     def __init__(self, **args):
         self._initialize(**args)
@@ -846,18 +848,17 @@ class Particles(SubSystem):
         self._constructAttributes()
 
     def _resetSubSystem(self):
-        """ Get Particles back to initial state
-		 """
+        """Get Particles back to initial state"""
         self._initialize(**self._args)
         super(Particles, self)._resetSubSystem()
         return 0
 
     def computeROG(self):
-        """ Computes the radius of gyration (ROG) for an N-particle system:
-		ROG = <\sqrt(\sum_i (r_i - rm)^2)> where rm is the mean position of all
-		particles, and <...> is the ensemble average. Alternatively, one can
-		compute ROG as \sum_i <r_i^T r_i> - rm ^T rm
-		"""
+        """Computes the radius of gyration (ROG) for an N-particle system:
+        ROG = <\sqrt(\sum_i (r_i - rm)^2)> where rm is the mean position of all
+        particles, and <...> is the ensemble average. Alternatively, one can
+        compute ROG as \sum_i <r_i^T r_i> - rm ^T rm
+        """
         positions = np.array([self.x, self.y, self.z]).T
         rm = positions.mean(axis=0)
         N = len(positions)
@@ -880,10 +881,10 @@ class Particles(SubSystem):
         )
 
     def computeRadius(self, N=100):
-        """ Computes the maximum radius of an N-particle (spherical) system
-		by sorting the radial components and returning the average of the sqrt
-		of the radius of the first N max data points.
-		"""
+        """Computes the maximum radius of an N-particle (spherical) system
+        by sorting the radial components and returning the average of the sqrt
+        of the radius of the first N max data points.
+        """
         positions = np.array([self.x, self.y, self.z]).T
         x, y, z = self.x, self.y, self.z
         rm = positions.mean(axis=0)
@@ -894,25 +895,25 @@ class Particles(SubSystem):
         return np.sqrt(r[-N:]).mean()
 
     def computeRDF(self, dr=None, center=True, rMax=None, npts=100):
-        """ Computes the three-dimensional radial distribution function for a set of
-		spherical particles contained in a cube with side length S.  This simple
-		function finds reference particles such that a sphere of radius rMax drawn
-		around the particle will fit entirely within the cube, eliminating the need
-		to compensate for edge effects.  If no such particles exist, an error is
-		returned.  Try a smaller rMax...or write some code to handle edge effects! ;)
+        """Computes the three-dimensional radial distribution function for a set of
+        spherical particles contained in a cube with side length S.  This simple
+        function finds reference particles such that a sphere of radius rMax drawn
+        around the particle will fit entirely within the cube, eliminating the need
+        to compensate for edge effects.  If no such particles exist, an error is
+        returned.  Try a smaller rMax...or write some code to handle edge effects! ;)
 
-		:param dr: increment for increasing radius of spherical shell
-		:type dr: float
+        :param dr: increment for increasing radius of spherical shell
+        :type dr: float
 
-		:param rMax: outer diameter of largest spherical shell
-		:type rMax: float
+        :param rMax: outer diameter of largest spherical shell
+        :type rMax: float
 
-		:param npts: number of discretized points that form the shells. If dr is set, npts is ignored.
-		:type npts: int 
+        :param npts: number of discretized points that form the shells. If dr is set, npts is ignored.
+        :type npts: int
 
-		:return: (rdf as numpy array, radii of spherical shells as numpy array, indices of particles)
-		:rtype: tuple
-		"""
+        :return: (rdf as numpy array, radii of spherical shells as numpy array, indices of particles)
+        :rtype: tuple
+        """
 
         if not (self.natoms > 0):
             raise RuntimeError("No Particles found.")
@@ -950,7 +951,7 @@ class Particles(SubSystem):
         bools5 = z > rMax - S
         bools6 = z < (S - rMax)
 
-        interior_indices, = np.where(
+        (interior_indices,) = np.where(
             bools1 * bools2 * bools3 * bools4 * bools5 * bools6
         )
         num_interior_particles = len(interior_indices)
@@ -992,9 +993,9 @@ class Particles(SubSystem):
 
     def computeAngleRepose(self):
         """
-		Computes the angle of repos theta = arctan(h_max/L)
-		in a sim box defined by [-Lx, Lx] x [-Ly, Ly] x [0, Lz]
-		"""
+        Computes the angle of repos theta = arctan(h_max/L)
+        in a sim box defined by [-Lx, Lx] x [-Ly, Ly] x [0, Lz]
+        """
         x, y, z = self.x, self.y, self.z
         dL = 0.25 * (x.max() - x.min()) + 0.25 * (y.max() - y.min())
         z_max = z.max() - z.min() - self.radius.mean()
@@ -1002,10 +1003,10 @@ class Particles(SubSystem):
         return np.arctan(z_max / dL) * 180.0 / np.pi
 
     def computeMass(self, tdensity):
-        """ Computes the mass of all particles 
+        """Computes the mass of all particles
 
-		@tdensity: true density of the powder
-		returns the summation of the mass of all particles """
+        @tdensity: true density of the powder
+        returns the summation of the mass of all particles"""
 
         if self.natoms > 0:
 
@@ -1017,17 +1018,17 @@ class Particles(SubSystem):
             return None
 
     def computeIntensitySegregation(self, resol=None):
-        """ Computes the intensity of segregation for binary mixture
-		as defined by Danckwerts:
+        """Computes the intensity of segregation for binary mixture
+        as defined by Danckwerts:
 
-		I = sigma_a**2 / (mean_a (1 - mean_a))
+        I = sigma_a**2 / (mean_a (1 - mean_a))
 
-		:param resol: bin size for grid construction (default 3 * diameter)
-		:type resol: float
+        :param resol: bin size for grid construction (default 3 * diameter)
+        :type resol: float
 
-		:return: intensity
-		:rtype: float 
-		"""
+        :return: intensity
+        :rtype: float
+        """
 
         if not resol:
             resol = self.radius.min() * 3
@@ -1075,18 +1076,18 @@ class Particles(SubSystem):
         return aStd ** 2 / (aMean * (1.0 - aMean)), indices_a, indices
 
     def computeScaleSegregation(self, nTrials=1000, resol=None, Npts=50, maxDist=None):
-        """ Computes the correlation coefficient as defined by Danckwerts:
-		R(r) = a * b / std(a)**2
+        """Computes the correlation coefficient as defined by Danckwerts:
+        R(r) = a * b / std(a)**2
 
-		This is done via a Monte Carlo simulation.
+        This is done via a Monte Carlo simulation.
 
-		@[resol]: bin size for grid construction (default min radius)
-		@[nTrials]: number of Monte Carlo trials (sample size)
-		@[Npts]: number of bins for histogram construction
-		@[maxDist]: maximum distance (in units of grid size) to sample
+        @[resol]: bin size for grid construction (default min radius)
+        @[nTrials]: number of Monte Carlo trials (sample size)
+        @[Npts]: number of bins for histogram construction
+        @[maxDist]: maximum distance (in units of grid size) to sample
 
-		Returns the coefficient of correlation R(r) and separation distance (r)
-		"""
+        Returns the coefficient of correlation R(r) and separation distance (r)
+        """
 
         if not resol:
             resol = self.radius.min()
@@ -1133,20 +1134,20 @@ class Particles(SubSystem):
 
     def computeDensity(self, tdensity, shape="box", bounds=None):
         """
-		Computes the bulk density for a selection of particles from their *true* density.
-		The volume is determined approximately by constructing a box/cylinder/cone
-		embedding the particles. Particles are assumed to be spherical in shape.
+        Computes the bulk density for a selection of particles from their *true* density.
+        The volume is determined approximately by constructing a box/cylinder/cone
+        embedding the particles. Particles are assumed to be spherical in shape.
 
-		@tdensity: true powder density
-		@[shape]: box, cylinder-x, cylinder-y, or cylinder-z
+        @tdensity: true powder density
+        @[shape]: box, cylinder-x, cylinder-y, or cylinder-z
 
-		"""
+        """
 
         return self.computeMass(tdensity).sum() / self.computeVolume(shape)
 
     def computeDensityLocal(self, tdensity, dr, axis):
-        """" Computes a localized density at a series of discretized regions of thickness 'dr'
-		along an axis specified by the user """
+        """ " Computes a localized density at a series of discretized regions of thickness 'dr'
+        along an axis specified by the user"""
 
         if axis == "x":
             r = self.x
@@ -1175,8 +1176,8 @@ class Particles(SubSystem):
         return thick, odensity
 
     def computeVolume(self, shape="box"):
-        """ Computes the volume of a granular system based on a simple geometry 
-		@[shape]: box, cylinder-x, cylinder-y, or cylinder-z"""
+        """Computes the volume of a granular system based on a simple geometry
+        @[shape]: box, cylinder-x, cylinder-y, or cylinder-z"""
 
         if self.natoms > 0:
 
@@ -1208,8 +1209,7 @@ class Particles(SubSystem):
         return 0
 
     def _goto(self, current_frame, go_frame):
-        """ This function assumes we're reading a non-const N trajectory.
-		"""
+        """This function assumes we're reading a non-const N trajectory."""
 
         # find the right frame number
         if self._singleFile:
@@ -1416,10 +1416,10 @@ class Particles(SubSystem):
         return ts
 
     def _readFile(self, frame):
-        """ Read a particle trajectory file.
+        """Read a particle trajectory file.
 
-		.. todo:: Support skip for single dump file
-		"""
+        .. todo:: Support skip for single dump file
+        """
 
         if "skip" in self._args:
             skip = self._args["skip"]
@@ -1477,19 +1477,19 @@ class Particles(SubSystem):
 
 class Factory(object):
     """A factory for system class. It creates subclasses of SubSystems. Its only two methods
-	are static, thus no need to instantiate this class.
+    are static, thus no need to instantiate this class.
 
-	@SubSystem: filename (or list of filenames) for the subsystem trajectory
-	@[units](si): unit system can be either 'si' or 'micro'
-	"""
+    @SubSystem: filename (or list of filenames) for the subsystem trajectory
+    @[units](si): unit system can be either 'si' or 'micro'
+    """
 
     def factory(**args):
-        """ Returns a list of Subsystems 
+        """Returns a list of Subsystems
 
-		System(Obj1=[(value11, args11), (value12, args12), ... (value1N, args1N)], ...)
+        System(Obj1=[(value11, args11), (value12, args12), ... (value1N, args1N)], ...)
 
-		args11, args12, etc. are dictionaries of keywords args for objects of type obj1.
-		"""
+        args11, args12, etc. are dictionaries of keywords args for objects of type obj1.
+        """
         obj = []
 
         if "module" in args:
@@ -1592,31 +1592,31 @@ class Factory(object):
 
 class System(object):
     """A System contains all the information describing a DEM system.
-	A meaningful system always requires at least one trajectory file to read. A trajectory is a (time)
-	series corresponding to the coordinates of all particles/meshes/objects in the system.
-	System handles the time frame and controls i/o operations. It contains one or more SubSystem
-	derivatives (e.g. 'Particles', 'Mesh') which store all the particle and mesh attributes
-	read from the trajectory file (variables such as positions, momenta, angular velocities,
-	forces, stresses, radii, etc.). Objects that can be created by this class must be of the 
-	'Particles' or 'Mesh' type. Multiple objects can be created by this class if a list of 
-	filenames are passed to its constructors.
+    A meaningful system always requires at least one trajectory file to read. A trajectory is a (time)
+    series corresponding to the coordinates of all particles/meshes/objects in the system.
+    System handles the time frame and controls i/o operations. It contains one or more SubSystem
+    derivatives (e.g. 'Particles', 'Mesh') which store all the particle and mesh attributes
+    read from the trajectory file (variables such as positions, momenta, angular velocities,
+    forces, stresses, radii, etc.). Objects that can be created by this class must be of the
+    'Particles' or 'Mesh' type. Multiple objects can be created by this class if a list of
+    filenames are passed to its constructors.
 
-	:param SubSystem: SubSystem (or its subclass) definition e.g. Particles or Mesh
-	:type SubSystem: str / list[str]
+    :param SubSystem: SubSystem (or its subclass) definition e.g. Particles or Mesh
+    :type SubSystem: str / list[str]
 
-	:param units: unit system can be either 'si' or 'micro'
-	:type units: str
+    :param units: unit system can be either 'si' or 'micro'
+    :type units: str
 
-	:param module: for user-defined dervied SubSystems, module specifies the name of 
-	the module in which the user-defined class is defined.
-	:type module: str
+    :param module: for user-defined dervied SubSystems, module specifies the name of
+    the module in which the user-defined class is defined.
+    :type module: str
 
-	:param units: unit system specification for input data, defaults to 'si'
-	:type units: str
+    :param units: unit system specification for input data, defaults to 'si'
+    :type units: str
 
-	.. note:: This class is an iterator that enables time stepping: when looping over System (storing a traj file), 
-	the frame is controlled only by System through methods defined in a SubSystem sublass (read/write functions).
-	"""
+    .. note:: This class is an iterator that enables time stepping: when looping over System (storing a traj file),
+    the frame is controlled only by System through methods defined in a SubSystem sublass (read/write functions).
+    """
 
     def __init__(self, **args):
 
@@ -1642,8 +1642,8 @@ class System(object):
         return self
 
     def units(self, iunits=None):
-        """ Change unit system to units or return units if None
-		units:  si, micro, cgs, or nano """
+        """Change unit system to units or return units if None
+        units:  si, micro, cgs, or nano"""
 
         from .tools import conversion
 
@@ -1660,8 +1660,8 @@ class System(object):
             raise ValueError("Unit system {} not supported".format(iunits))
 
     def goto(self, frame):
-        """ Go to a specific frame in the trajectory. If frame is -1
-		then this function will read the last frame """
+        """Go to a specific frame in the trajectory. If frame is -1
+        then this function will read the last frame"""
 
         # nothing to do
         if frame == self.frame:
@@ -1703,8 +1703,8 @@ class System(object):
         return self.frame
 
     def skip(self):
-        """ Skips all empty frames i.e. moves the trajectory to the 1st frame containing
-		non-zero elements """
+        """Skips all empty frames i.e. moves the trajectory to the 1st frame containing
+        non-zero elements"""
         forward = True
 
         while forward:
@@ -1773,8 +1773,8 @@ class System(object):
         return self.frame
 
     def _updateSystem(self):
-        """ Makes sure the system is aware of any update in its attributes caused by
-		a frame change. """
+        """Makes sure the system is aware of any update in its attributes caused by
+        a frame change."""
 
         # A generic way of invoking _updateSystem
 
@@ -1806,20 +1806,20 @@ def numericalSort(value):
 
 def select(data, *region):
     """
-	Create a selection of particles based on a region-defined subsystem.
-	:param data: input data
-	:type data:  dict
+    Create a selection of particles based on a region-defined subsystem.
+    :param data: input data
+    :type data:  dict
 
-	:param region: defines the region in the form: (xmin, xmax, ymin, ymax, zmin, zmax). 
-	:type region: tuple
+    :param region: defines the region in the form: (xmin, xmax, ymin, ymax, zmin, zmax).
+    :type region: tuple
 
-	:return: indices of selected atoms
-	:rtype: list
-	
-	.. todo:: Make this function more generic and compliant with the rest of this module
+    :return: indices of selected atoms
+    :rtype: list
 
-	.. note:: When region is not supplied, all particle indices are returned
-	"""
+    .. todo:: Make this function more generic and compliant with the rest of this module
+
+    .. note:: When region is not supplied, all particle indices are returned
+    """
 
     try:
         if not len(region):

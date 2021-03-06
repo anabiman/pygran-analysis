@@ -35,19 +35,19 @@ from . import core, equilibrium
 
 
 def rand(natoms, radius, overlapping=True, factor=1.0):
-    """ Creates a set of randomly placed non-overlapping particles 
+    """Creates a set of randomly placed non-overlapping particles
 
-	:param natoms: number of particles to create
-	:type natoms: int
-	:param radius: particle radius
-	:type radius: float or array of length natoms
-	:param overlapping:  ensures all particles are allowed to overlap or not
-	:type overlapping: bool
-	:param factor: number to scale noise with (w.r.t particle radius) when correcting for overlapping particles
-	:type factor: float
-	:returns: a new Particles object
-	:rtype: Particles
-	"""
+    :param natoms: number of particles to create
+    :type natoms: int
+    :param radius: particle radius
+    :type radius: float or array of length natoms
+    :param overlapping:  ensures all particles are allowed to overlap or not
+    :type overlapping: bool
+    :param factor: number to scale noise with (w.r.t particle radius) when correcting for overlapping particles
+    :type factor: float
+    :returns: a new Particles object
+    :rtype: Particles
+    """
 
     scale = 2.0 * natoms ** (1.0 / 3)
 
@@ -109,15 +109,15 @@ def rand(natoms, radius, overlapping=True, factor=1.0):
 
 
 def hcp(natoms, radius, units="si"):
-    """ Generates a Hexagonal Close Packed structure
-		
-	:param natoms: number of particles to create
-	:type natoms: int
-	:param radius: particle radius
-	:type radius: float or array of length natoms
-	:returns: a new Particles object
-	:rtype: Particles
-	"""
+    """Generates a Hexagonal Close Packed structure
+
+    :param natoms: number of particles to create
+    :type natoms: int
+    :param radius: particle radius
+    :type radius: float or array of length natoms
+    :returns: a new Particles object
+    :rtype: Particles
+    """
     data = collections.OrderedDict()
     N = int(natoms ** (1 / 3.0))
     count = 0

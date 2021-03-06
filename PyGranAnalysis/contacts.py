@@ -39,9 +39,9 @@ import matplotlib.pylab as plt
 
 
 class Neighbors(object):
-    """ A dynamic class that contains all the particle-particle (and optionally particle-wall)
-	neighbors from which contacts, overlaps, force chains, etc. can be determined.
-	"""
+    """A dynamic class that contains all the particle-particle (and optionally particle-wall)
+    neighbors from which contacts, overlaps, force chains, etc. can be determined.
+    """
 
     def __init__(self, Particles, material=None, cutoff=None):
 
@@ -106,11 +106,11 @@ class Neighbors(object):
         return self._overlaps
 
     def filter(self, percent=None):
-        """ Returns a non-overlapping Particles class from the given configuration 
-		
-		@[percent]: filter all particles overlapping by a certain percentage
-		@
-		"""
+        """Returns a non-overlapping Particles class from the given configuration
+
+        @[percent]: filter all particles overlapping by a certain percentage
+        @
+        """
 
         percent /= 100.0
 
@@ -148,13 +148,13 @@ class Neighbors(object):
         peters=True,
         threshold=1,
     ):
-        """ Computes the force chain based on an algorithm published in Phys. Rev. E. 72, 041307 (2005):
-		'Characterization of force chains in granular material'.
+        """Computes the force chain based on an algorithm published in Phys. Rev. E. 72, 041307 (2005):
+        'Characterization of force chains in granular material'.
 
-		@ axis: a tuple of size 2 that specifies the two axis to use for computing the force chain, e.g. axis=(0,1) -> (x,y)
-		@ alpha: the angle (in radians) that controls the deviation of the force chain. A value of 0 means a perfectly linear chain.
-		Thus, alpha is a measure of the 'curvature' of the force chain. See page 5 of the paper cited above.
-		"""
+        @ axis: a tuple of size 2 that specifies the two axis to use for computing the force chain, e.g. axis=(0,1) -> (x,y)
+        @ alpha: the angle (in radians) that controls the deviation of the force chain. A value of 0 means a perfectly linear chain.
+        Thus, alpha is a measure of the 'curvature' of the force chain. See page 5 of the paper cited above.
+        """
 
         stress = numpy.zeros((self._Particles.natoms, 2, 2))
         stress_prin = numpy.zeros(
@@ -403,8 +403,8 @@ class Neighbors(object):
             return chain, stress_prin
 
     def findWithin(self, coords, r):
-        """ Find all points within distance r of point(s) coords.
-		TODO: Support walls aligned arbitrarily in space """
+        """Find all points within distance r of point(s) coords.
+        TODO: Support walls aligned arbitrarily in space"""
 
         indices = numpy.arange(
             self._Particles.natoms
