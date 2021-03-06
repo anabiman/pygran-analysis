@@ -34,7 +34,7 @@ from numbers import Number
 try:
     from PIL import Image
 except Exception:
-    print("Warning: no installation of PIL found.")
+    Image = None
 import glob, os
 from numpy import random, array, linspace, sqrt, fabs
 import numpy as np
@@ -43,12 +43,12 @@ from scipy.stats import binned_statistic
 
 def readExcel(fname):
     """
-	Reads an excel sheet(s) and appends each data column to 
-	a dictionary
+    Reads an excel sheet(s) and appends each data column to
+    a dictionary
 
-	:param fname: filename to read
-	:type file: str
-	"""
+    :param fname: filename to read
+    :type file: str
+    """
     from xlrd import open_workbook
 
     book = open_workbook(fname, on_demand=True)
@@ -115,36 +115,38 @@ def slice(
     Particles, zmin, zmax, axis, resol=None, size=None, output=None, imgShow=False
 ):
     """
-	Generates a 2D image from a slice (limited by 'zmin/zmax' and of resolution '1/dz') 
-	of a 3D config in the Particles class. The 'resol' is in distance per pixel, which controls
-	the image size unless 'size' is supplied by the user. The latter is useful when constructing
-	a 3D image of constant number of rows/columns.
-	
-	:param Particles: an object (e.g. analysis.core.SubSystem) which stores particle positions and radii
-	:type Particles: object
+    Generates a 2D image from a slice (limited by 'zmin/zmax' and of resolution '1/dz')
+    of a 3D config in the Particles class. The 'resol' is in distance per pixel, which controls
+    the image size unless 'size' is supplied by the user. The latter is useful when constructing
+    a 3D image of constant number of rows/columns.
 
-	:param zmin: minimum height/depth/width of the slice
-	:type zmin: float
+    :param Particles: an object (e.g. analysis.core.SubSystem) which stores particle positions and radii
+    :type Particles: object
 
-	:param max: maximum height/depth/width of the slice
-	:type max: float
+    :param zmin: minimum height/depth/width of the slice
+    :type zmin: float
 
-	:param axis: sets the axis to slice the image across ('x', 'y', or 'z')
-	:type axis: str
+    :param max: maximum height/depth/width of the slice
+    :type max: float
 
-	:param resol: image resolution in distance/pixel
-	:type resol: float
+    :param axis: sets the axis to slice the image across ('x', 'y', or 'z')
+    :type axis: str
 
-	:param size: tuple (length, width) specifying the generated image size
-	:type size: tuple
+    :param resol: image resolution in distance/pixel
+    :type resol: float
 
-	:param output: sets the img output filename to be written
-	:type output: str
-	
-	:param imgShow: displays the output image if set to True
-	:type imgShow: bool
-	"""
+    :param size: tuple (length, width) specifying the generated image size
+    :type size: tuple
 
+    :param output: sets the img output filename to be written
+    :type output: str
+
+    :param imgShow: displays the output image if set to True
+    :type imgShow: bool
+    """
+
+    if not Image:
+        raise ModuleNotFoundError(f"PIL pkg must be installed to use this routines: {__name__}")
     Particles = Particles.copy()
 
     Particles.translate(("x", -Particles.x.min()))
@@ -224,30 +226,30 @@ def slice(
 
 
 def readImg(file, order=False, ncores=None, fillHoles=False, flip=False):
-    """ Loads image file(s) and returns an array 
+    """Loads image file(s) and returns an array
 
-	:param file: a list of image file names, or a string containing the image filename(s). In
-	the latter case, if the string ends in '*' (e.g. img*), then all image files starting
-	with 'img' are read (in a chronological order if order is set to True).
-	:type file: list or str
+    :param file: a list of image file names, or a string containing the image filename(s). In
+    the latter case, if the string ends in '*' (e.g. img*), then all image files starting
+    with 'img' are read (in a chronological order if order is set to True).
+    :type file: list or str
 
-	:param order: read a list of image files chronologically if set to True
-	:type order: bool
+    :param order: read a list of image files chronologically if set to True
+    :type order: bool
 
-	:param ncores: number of cores to use for running in parallel
-	:type ncores: int
+    :param ncores: number of cores to use for running in parallel
+    :type ncores: int
 
-	:param fillHoles: fill holes in 3D image when set to True
-	:type fillHoles: bool
+    :param fillHoles: fill holes in 3D image when set to True
+    :type fillHoles: bool
 
-	:param flip: flip image indices when reading data (for reading matlab images) when set to True
-	:type flip: bool
+    :param flip: flip image indices when reading data (for reading matlab images) when set to True
+    :type flip: bool
 
-	:return: 2D/3D array representation of all img file(s) read
-	:rtype: numpy array
+    :return: 2D/3D array representation of all img file(s) read
+    :rtype: numpy array
 
-	.. todo:: Fix parallel mode
-	"""
+    .. todo:: Fix parallel mode
+    """
     if isinstance(file, list):
         pass
     elif isinstance(file, str):
@@ -313,26 +315,26 @@ def readImg(file, order=False, ncores=None, fillHoles=False, flip=False):
 
 
 def coarseDiscretize(images, binsize, order=False, fillHoles=False, flip=False):
-    """ Discretizes a 3D image into a coarse grid
+    """Discretizes a 3D image into a coarse grid
 
-	:param images: list of image file strings
-	:type images: list
+    :param images: list of image file strings
+    :type images: list
 
-	:param binsize: length of each discrete grid cell in pixels
-	:type binsize: float
+    :param binsize: length of each discrete grid cell in pixels
+    :type binsize: float
 
-	:param order: read images in a chronological order if set to True
-	:type order: bool
+    :param order: read images in a chronological order if set to True
+    :type order: bool
 
-	:param fillHoles: fill holes in 3D image if set to True
-	:type fillHoles: bool
+    :param fillHoles: fill holes in 3D image if set to True
+    :type fillHoles: bool
 
-	:param flip: flip image indices when reading data (for reading matlab images) when set to True
-	:type flip: bool
+    :param flip: flip image indices when reading data (for reading matlab images) when set to True
+    :type flip: bool
 
-	:return: tuple of (vol fraction 3D arrays, vol fraction mean, and vol fraction variance)
-	:rtype: tuple
-	"""
+    :return: tuple of (vol fraction 3D arrays, vol fraction mean, and vol fraction variance)
+    :rtype: tuple
+    """
 
     dataList = []
 
@@ -397,25 +399,25 @@ def coarseDiscretize(images, binsize, order=False, fillHoles=False, flip=False):
 
 
 def intensitySegregation(images, binsize, order=False, flip=False):
-    """ Computes the intensity of segregation from a set of image files
+    """Computes the intensity of segregation from a set of image files
 
-	:param images: list of image file strings
-	:type images: list
+    :param images: list of image file strings
+    :type images: list
 
-	:param binsize: length of each discrete grid cell in pixels
-	:type binsize: float
+    :param binsize: length of each discrete grid cell in pixels
+    :type binsize: float
 
-	:param order: read images in a chronological order if set to True
-	:type order: bool
+    :param order: read images in a chronological order if set to True
+    :type order: bool
 
-	:param flip: flip image indices when reading data (for reading matlab images) when set to True
-	:type flip: bool
+    :param flip: flip image indices when reading data (for reading matlab images) when set to True
+    :type flip: bool
 
-	:return: a tuple of (mean volume fraction, variance in volum fraction, intensity)
-	:rtype: tuple
+    :return: a tuple of (mean volume fraction, variance in volum fraction, intensity)
+    :rtype: tuple
 
-	.. todo:: Support multi-component systems, not just binary systems
-	"""
+    .. todo:: Support multi-component systems, not just binary systems
+    """
 
     _, dataMean, dataVar = coarseDiscretize(images, binsize, order, flip)
 
@@ -433,40 +435,40 @@ def scaleSegregation(
     fillHoles=False,
     flip=False,
 ):
-    """ Computes (through Monte Carlo sim) the linear scale of segregation from a set of image files
+    """Computes (through Monte Carlo sim) the linear scale of segregation from a set of image files
 
-	:param images: list of image file strings
-	:type images: list
+    :param images: list of image file strings
+    :type images: list
 
-	:param binsize: length of each discrete grid cell in pixels
-	:type binsize: float
+    :param binsize: length of each discrete grid cell in pixels
+    :type binsize: float
 
-	:param samplesize: number of successful Monte Carlo trials
-	:type samplesize: int
-	
-	:param resol: image resolution (distance/pixel)
-	:type resol: float
+    :param samplesize: number of successful Monte Carlo trials
+    :type samplesize: int
 
-	:param maxDist: maximum distance (in pixels) to sample
-	:type maxDist: float
+    :param resol: image resolution (distance/pixel)
+    :type resol: float
 
-	:param order: read images in a chronological order if set to True
-	:type order: bool
+    :param maxDist: maximum distance (in pixels) to sample
+    :type maxDist: float
 
-	:param fillHoles: fill holes in 3D image if set to True
-	:type fillHoles: bool
+    :param order: read images in a chronological order if set to True
+    :type order: bool
 
-	:param flip: flip image indices when reading data (for reading matlab images) when set to True
-	:type flip: bool
+    :param fillHoles: fill holes in 3D image if set to True
+    :type fillHoles: bool
 
-	:param Npts: number of data points to average fft correlation over
-	:type Npts: int
+    :param flip: flip image indices when reading data (for reading matlab images) when set to True
+    :type flip: bool
 
-	:return: a tuple of (separation distance (r)m coefficient of correlation R(r))
-	:rtype: tuple
+    :param Npts: number of data points to average fft correlation over
+    :type Npts: int
 
-	.. todo:: Support multi-component systems, not just binary systems
-	"""
+    :return: a tuple of (separation distance (r)m coefficient of correlation R(r))
+    :rtype: tuple
+
+    .. todo:: Support multi-component systems, not just binary systems
+    """
 
     volFrac, volMean, volVar = coarseDiscretize(images, binsize, order, fillHoles, flip)
 
@@ -533,40 +535,40 @@ def scaleSegregation(
 def scaleSegregation_fft(
     images, binsize, resol, order=False, fillHoles=False, flip=False, Npts=50
 ):
-    """ Computes (via Monte Carlo sim) the linear scale of segregation from a set of image files using FFT.
+    """Computes (via Monte Carlo sim) the linear scale of segregation from a set of image files using FFT.
 
-	:param images: list of image file strings
-	:type images: list
+    :param images: list of image file strings
+    :type images: list
 
-	:param binsize: length of each discrete grid cell in pixels
-	:type binsize: float
+    :param binsize: length of each discrete grid cell in pixels
+    :type binsize: float
 
-	:param samplesize: number of successful Monte Carlo trials
-	:type samplesize: int
-	
-	:param resol: image resolution (distance/pixel)
-	:type resol: float
+    :param samplesize: number of successful Monte Carlo trials
+    :type samplesize: int
 
-	:param maxDist: maximum distance (in pixels) to sample
-	:type maxDist: float
+    :param resol: image resolution (distance/pixel)
+    :type resol: float
 
-	:param order: read images in a chronological order if set to True
-	:type order: bool
+    :param maxDist: maximum distance (in pixels) to sample
+    :type maxDist: float
 
-	:param fillHoles: fill holes in 3D image if set to True
-	:type fillHoles: bool
+    :param order: read images in a chronological order if set to True
+    :type order: bool
 
-	:param flip: flip image indices when reading data (for reading matlab images) when set to True
-	:type flip: bool
+    :param fillHoles: fill holes in 3D image if set to True
+    :type fillHoles: bool
 
-	:param Npts: number of data points to average fft correlation over
-	:type Npts: int
+    :param flip: flip image indices when reading data (for reading matlab images) when set to True
+    :type flip: bool
 
-	:return: a tuple of (separation distance (r)m coefficient of correlation R(r))
-	:rtype: tuple
+    :param Npts: number of data points to average fft correlation over
+    :type Npts: int
 
-	.. todo:: Support multi-component systems, not just binary systems
-	"""
+    :return: a tuple of (separation distance (r)m coefficient of correlation R(r))
+    :rtype: tuple
+
+    .. todo:: Support multi-component systems, not just binary systems
+    """
 
     volFrac, volMean, volVar = coarseDiscretize(images, binsize, order, fillHoles, flip)
 
