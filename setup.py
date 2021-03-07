@@ -1,5 +1,5 @@
 """
-Setup file for PyGran.analysis
+Setup file for pygran_analysis
 
 Created on October 10, 2019
 
@@ -30,59 +30,50 @@ and LICENS
 """
 
 from setuptools import setup, find_packages
+import versioneer
+import warnings
 import os
 
-# Extract metadata from _version
-with open(os.path.join("PyGranAnalysis", "_version.py"), "r") as fp:
-    for line in fp.readlines():
-        if "__version__" in line:
-            __version__ = line.split("=")[-1].strip().strip("''")
-        elif "__email__" in line:
-            __email__ = line.split("=")[-1].strip().strip("''")
-        elif "__author__" in line:
-            __author__ = line.split("=")[-1].strip().strip("''")
 try:
     from Cython.Build import cythonize
     import numpy
 
-    optimal_list = cythonize("PyGranAnalysis/core.pyx")
+    optimal_list = cythonize("pygran_analysis/core.pyx")
     include_dirs = [numpy.get_include()]
-except:
-    print("Could not cythonize. Make sure Cython is properly installed.")
+except Exception:
+    warnings.warn(
+        "Could not cythonize. Make sure Cython is properly installed. Proceeding with unoptimized code.",
+        UserWarning,
+    )
     optimal_list = []
     include_dirs = []
 
 setup(
-    name="PyGranAnalysis",
-    version=__version__,
-    author=__author__,
-    author_email=__email__,
+    name="pygran_analysis",
+    version=versioneer.get_version(),
+    author="Andrew Abi-Mansour",
+    author_email="support@pygran.org",
     description=(
-        "A submodule part of PyGran toolkit for rapid quantitative analysis of granular/powder systems"
+        "A package for rapid quantitative analysis of granular/powder systems"
     ),
     license="GNU v2",
     keywords="Discrete Element Method, Granular Materials",
-    url="https://github.com/Andrew-AbiMansour/PyGran",
+    url="www.PyGran.org",
     packages=find_packages(),
     include_package_data=True,
     install_requires=["numpy", "scipy"],
-    extras_require={"extra": ["vtk", "Pillow"]},
-    long_description="A submodule part of PyGran toolkit for rapid quantitative analysis of granular/powder systems."
-    + " See http://www.pygran.org for more info on PyGran.",
+    extras_require={"extras": ["vtk", "Pillow"], "tests": ["pytest"]},
     classifiers=[
         "Development Status :: 4 - Beta",
         "Topic :: Utilities",
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
-        "Programming Language :: C",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Cython",
         "Operating System :: POSIX :: Linux",
     ],
     zip_safe=False,
     ext_modules=optimal_list,
     include_dirs=include_dirs,
+    cmdclass=versioneer.get_cmdclass(),
 )
