@@ -1,0 +1,2 @@
+include versioneer.py
+include pygran_analysis/_version.py
