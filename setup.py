@@ -38,11 +38,16 @@ try:
     from Cython.Build import cythonize
     import numpy
 
-    optimal_list = cythonize("pygran_analysis/core.pyx")
+    optimal_list = cythonize(
+        "pygran_analysis/opt_core.pyx",
+        compiler_directives={"language_level": "3"},
+        annotate=True,
+    )
     include_dirs = [numpy.get_include()]
 except Exception:
     warnings.warn(
-        "Could not cythonize. Make sure Cython is properly installed. Proceeding with unoptimized code.",
+        "Could not cythonize. Make sure Cython and NumPy are properly installed. "
+        "Proceeding with unoptimized code ...",
         UserWarning,
     )
     optimal_list = []
@@ -62,7 +67,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=["numpy", "scipy"],
-    extras_require={"extras": ["vtk", "Pillow"], "tests": ["pytest"]},
+    extras_require={"extras": ["vtk", "Pillow", "cython"], "tests": ["pytest"]},
     classifiers=[
         "Development Status :: 4 - Beta",
         "Topic :: Utilities",
