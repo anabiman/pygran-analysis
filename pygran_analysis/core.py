@@ -29,7 +29,7 @@ If not, see http://www.gnu.org/licenses . See also top-level README
 and LICENSE files.
 """
 
-import numpy as np
+import numpy
 
 import types
 from random import choice
@@ -41,8 +41,9 @@ import collections
 try:
     import vtk
     from vtk.util.numpy_support import vtk_to_numpy
-except:
-    pass
+except Exception:
+    vtk = None
+    vtk_to_numpy = None
 
 from .tools import convert
 from scipy.stats import binned_statistic
@@ -63,8 +64,8 @@ these properties. This class is iterable but NOT an iterator.
 	:note: See `code <https://github.com/Andrew-AbiMansour/PyGranAnalysis/blob/master/PyGranAnalysis/tools.py>`_ for available unit systems
 	"""
 
-    def __init__(self, **args):
-        self._initilize(**args)
+    def __init__(self, **kwargs):
+        self._initialize(**kwargs)
 
     def _initialize(self, **args):
         """This function exists mostly for convenience. It does everything expected from __init__ and is used by other methods
@@ -148,7 +149,7 @@ these properties. This class is iterable but NOT an iterator.
 
     @property
     def keys(self):
-        """ Returns all stored attribute keynames """
+        """Returns all stored attribute keynames"""
         if hasattr(self, "data"):
             return self.data.keys()
         else:
@@ -158,33 +159,33 @@ these properties. This class is iterable but NOT an iterator.
         """A meta function for returning dynamic class attributes treated as lists (for easy slicing)
         and return as numpy arrays for numerical computations / manipulations"""
 
-        if isinstance(self.data[key], np.ndarray):
+        if isinstance(self.data[key], numpy.ndarray):
             self.data[key].flags.writeable = False
 
         return self.data[key]
 
     def _resetSubSystem(self):
-        """ Mainly used by System for rewinding traj back to frame 0 """
+        """Mainly used by System for rewinding traj back to frame 0"""
         self._constructAttributes()
         return 0
 
     def _constructAttributes(self, sel=None, mesh=False):
-        """ Constructs dynamic functions (getters) for all keys found in the trajectory """
+        """Constructs dynamic functions (getters) for all keys found in the trajectory"""
 
         for key in self.data.keys():
 
             if hasattr(self, key):
                 delattr(self, key)
 
-            if isinstance(self.data[key], np.ndarray):
+            if isinstance(self.data[key], numpy.ndarray):
 
                 if sel is not None:
-                    if isinstance(self.data[key], np.ndarray):
+                    if isinstance(self.data[key], numpy.ndarray):
                         self.data[key].flags.writeable = True
 
                     self.data[key] = self.data[key][sel]
 
-                    if isinstance(self.data[key], np.ndarray):
+                    if isinstance(self.data[key], numpy.ndarray):
                         self.data[key].flags.writeable = False
 
             # Checks if the trajectory file supports reduction in key getters
@@ -223,7 +224,7 @@ these properties. This class is iterable but NOT an iterator.
         self.__dict__[name] = value
 
     def __getitem__(self, sel):
-        """ SubSystem can be sliced with this function """
+        """SubSystem can be sliced with this function"""
 
         if hasattr(self, "__module__"):
             # Could not find cName, search for it in cwd (if it is user-defined)
@@ -239,14 +240,14 @@ these properties. This class is iterable but NOT an iterator.
     def __and__(
         self,
     ):
-        """ Boolean logical operator on particles """
+        """Boolean logical operator on particles"""
 
     def copy(self):
-        """ Returns a hard copy of the SubSystem """
+        """Returns a hard copy of the SubSystem"""
         data = self.data.copy()
 
         for key in self.data.keys():
-            if type(data[key]) == np.ndarray:
+            if type(data[key]) == numpy.ndarray:
                 data[key] = data[key].copy()
             else:
                 data[key] = data[key]
@@ -262,37 +263,37 @@ these properties. This class is iterable but NOT an iterator.
 
             if key == "x" or key == "y" or key == "z" or key == "radius":
 
-                if type(self.data[key]) == np.ndarray:
+                if type(self.data[key]) == numpy.ndarray:
                     self.data[key].flags.writeable = True
 
                 self.data[key] *= factors["distance"][0]
 
-                if type(self.data[key]) == np.ndarray:
+                if type(self.data[key]) == numpy.ndarray:
                     self.data[key].flags.writeable = False
 
             elif key == "vx" or key == "vy" or key == "vz":
 
-                if type(self.data[key]) == np.ndarray:
+                if type(self.data[key]) == numpy.ndarray:
                     self.data[key].flags.writeable = True
 
                 self.data[key] *= factors["distance"][0] / factors["time"][0]
 
-                if type(self.data[key]) == np.ndarray:
+                if type(self.data[key]) == numpy.ndarray:
                     self.data[key].flags.writeable = False
 
             elif key == "omegax" or key == "omegay" or key == "omegaz":
 
-                if type(self.data[key]) == np.ndarray:
+                if type(self.data[key]) == numpy.ndarray:
                     self.data[key].flags.writeable = True
 
                 self.data[key] /= factors["time"][0]
 
-                if type(self.data[key]) == np.ndarray:
+                if type(self.data[key]) == numpy.ndarray:
                     self.data[key].flags.writeable = False
 
             elif key == "fx" or key == "fy" or key == "fz":
 
-                if type(self.data[key]) == np.ndarray:
+                if type(self.data[key]) == numpy.ndarray:
                     self.data[key].flags.writeable = True
 
                 self.data[key] *= (
@@ -301,7 +302,7 @@ these properties. This class is iterable but NOT an iterator.
                     / factors["time"][0] ** 2.0
                 )
 
-                if type(self.data[key]) == np.ndarray:
+                if type(self.data[key]) == numpy.ndarray:
                     self.data[key].flags.writeable = False
             else:
                 pass
@@ -317,13 +318,15 @@ these properties. This class is iterable but NOT an iterator.
         self._units = units
 
     def __iadd__(self, obj):
-        """ Adds attributes of obj to current SubSystem """
+        """Adds attributes of obj to current SubSystem"""
 
         if type(obj) is type(self):
             for key in self.data.keys():
                 if key in obj.data:
-                    if type(self.data[key]) is np.ndarray:
-                        self.data[key] = np.concatenate((self.data[key], obj.data[key]))
+                    if type(self.data[key]) is numpy.ndarray:
+                        self.data[key] = numpy.concatenate(
+                            (self.data[key], obj.data[key])
+                        )
 
         self.__init__(None, self.units, **self.data)
 
@@ -340,8 +343,8 @@ these properties. This class is iterable but NOT an iterator.
             for key in self.keys:
 
                 if key in obj.data:
-                    if isinstance(self.data[key], np.ndarray):
-                        data[key] = np.concatenate((self.data[key], obj.data[key]))
+                    if isinstance(self.data[key], numpy.ndarray):
+                        data[key] = numpy.concatenate((self.data[key], obj.data[key]))
                     elif isinstance(self.data[key], numbers.Number):
                         data[key] = self.data[key] + obj.data[key]
                     else:
@@ -366,7 +369,7 @@ these properties. This class is iterable but NOT an iterator.
         if type(obj) is tuple:
             obj, att = obj
             if type(obj) is type(self):
-                if att is "all":
+                if att == "all":
                     pass
                 elif len(obj) == len(
                     self
@@ -400,9 +403,9 @@ these properties. This class is iterable but NOT an iterator.
         for key in self.keys:
 
             if key in obj.data:
-                if isinstance(self.data[key], np.ndarray):
-                    data[key] = np.sqrt(
-                        np.outer(self.data[key], obj.data[key])
+                if isinstance(self.data[key], numpy.ndarray):
+                    data[key] = numpy.sqrt(
+                        numpy.outer(self.data[key], obj.data[key])
                     ).flatten()
                 else:
                     # what to do with tuples / lists such as box size ???
@@ -420,7 +423,7 @@ these properties. This class is iterable but NOT an iterator.
         if type(obj) is tuple:
             obj, att = obj
             if type(obj) is type(self):
-                if att is "all":
+                if att == "all":
                     pass
                 elif len(obj) == len(
                     self
@@ -461,12 +464,12 @@ these properties. This class is iterable but NOT an iterator.
         for at in attr:
             if at in self.data:
 
-                if type(self.data[at]) is np.ndarray:
+                if isinstance(self.data[at], numpy.ndarray):
                     self.data[at].flags.writeable = True
 
                 self.data[at] *= value
 
-                if type(self.data[at]) is np.ndarray:
+                if isinstance(self.data[at], numpy.ndarray):
                     self.data[at].flags.writeable = False
 
         self._constructAttributes()
@@ -486,12 +489,12 @@ these properties. This class is iterable but NOT an iterator.
         for i, at in enumerate(attr):
             if at in self.data:
 
-                if isinstance(self.data[at], np.ndarray):
+                if isinstance(self.data[at], numpy.ndarray):
                     self.data[at].flags.writeable = True
 
                 self.data[at] += value[i]
 
-                if isinstance(self.data[at], np.ndarray):
+                if isinstance(self.data[at], numpy.ndarray):
                     self.data[at].flags.writeable = False
 
         self._constructAttributes()
@@ -509,11 +512,11 @@ these properties. This class is iterable but NOT an iterator.
         for at in attr:
             if at in self.data:
 
-                if type(self.data[at]) is np.ndarray:
+                if isinstance(self.data[at], numpy.ndarray):
                     self.data[at].flags.writeable = True
 
                     self.data[at] += sigma * (
-                        1.0 - 2.0 * np.random.rand(len(self.data[at]))
+                        1.0 - 2.0 * numpy.random.rand(len(self.data[at]))
                     )
 
                     self.data[at].flags.writeable = True
@@ -521,9 +524,9 @@ these properties. This class is iterable but NOT an iterator.
         self._constructAttributes()
 
     def __len__(self):
-        """ Returns the number of elements (e.g. particles or nodes) in a SubSystem """
+        """Returns the number of elements (e.g. particles or nodes) in a SubSystem"""
         for key in self.data.keys():
-            if type(self.data[key]) == np.ndarray:
+            if type(self.data[key]) == numpy.ndarray:
                 return len(self.data[key])
 
         # Assume we're dealing with single particle object
@@ -596,7 +599,7 @@ class Mesh(SubSystem):
         if points:
             if cells:
 
-                np_pts = np.zeros(
+                np_pts = numpy.zeros(
                     (
                         self.nCells(),
                         self._output.GetCell(0).GetPoints().GetNumberOfPoints(),
@@ -608,18 +611,18 @@ class Mesh(SubSystem):
                 if (
                     self._output.GetCell(0).GetNumberOfFaces() == 6
                 ):  # we're dealing with a rectangular element
-                    self.data["CellVol"] = np.zeros(self.nCells())
+                    self.data["CellVol"] = numpy.zeros(self.nCells())
                 elif self._output.GetCell(0).GetNumberOfFaces() == 0:  # 2D mesh
-                    self.data["CellArea"] = np.zeros(self.nCells())
+                    self.data["CellArea"] = numpy.zeros(self.nCells())
 
                 for i in range(self.nCells()):
                     pts = self._output.GetCell(i).GetPoints()
                     np_pts[i] = vtk_to_numpy(pts.GetData())
 
                 # Find the axis of alignment for all cells using 1 (arbitrary) node
-                if np.diff(np_pts[:, 0, 0]).any() == 0.0:
+                if numpy.diff(np_pts[:, 0, 0]).any() == 0.0:
                     indices = 1, 2
-                elif np.diff(np_pts[:, 0, 1]).any() == 0.0:
+                elif numpy.diff(np_pts[:, 0, 1]).any() == 0.0:
                     indices = 0, 2
                 else:
                     indices = 0, 1
@@ -635,14 +638,14 @@ class Mesh(SubSystem):
 
                     if "CellArea" in self.data:
                         # Shoelace  algorithm for computing areas of polygons
-                        self.data["CellArea"][i] = 0.5 * np.abs(
-                            np.dot(
+                        self.data["CellArea"][i] = 0.5 * numpy.abs(
+                            numpy.dot(
                                 np_pts[i][:, indices[0]],
-                                np.roll(np_pts[i][:, indices[1]], 1),
+                                numpy.roll(np_pts[i][:, indices[1]], 1),
                             )
-                            - np.dot(
+                            - numpy.dot(
                                 np_pts[i][:, indices[1]],
-                                np.roll(np_pts[i][:, indices[0]], 1),
+                                numpy.roll(np_pts[i][:, indices[0]], 1),
                             )
                         )
 
@@ -688,7 +691,7 @@ class Mesh(SubSystem):
         self._constructAttributes(mesh=True)
 
     def _updateSystem(self):
-        """ Class function for updating the state of a Mesh """
+        """Class function for updating the state of a Mesh"""
         # Must make sure fname is passed in case we're looping over a trajectory
         self._args["mesh"] = self._mesh
         self._args["units"] = self._units
@@ -723,7 +726,7 @@ class Mesh(SubSystem):
         return frame
 
     def _readFile(self, frame):
-        """ Reads a mesh file """
+        """Reads a mesh file"""
 
         if "skip" in self._args:
             skip = self._args["skip"]
@@ -748,17 +751,17 @@ class Particles(SubSystem):
     """The Particle class stores all particle properties and the methods that operate on
     these properties. This class is iterable but NOT an iterator."""
 
-    def __init__(self, **args):
-        self._initialize(**args)
+    def __init__(self, **kwargs):
+        self._initialize(**kwargs)
 
-    def _initialize(self, **args):
+    def _initialize(self, **kwargs):
 
-        if "sel" in args:
-            sel = args["sel"]
+        if "sel" in kwargs:
+            sel = kwargs["sel"]
         else:
             sel = None
 
-        super(Particles, self)._initialize(**args)
+        super()._initialize(**kwargs)
 
         if not hasattr(self, "_fp"):  # Make sure a file is already not open
             if hasattr(self, "_fname"):
@@ -812,15 +815,15 @@ class Particles(SubSystem):
         self._constructAttributes()
 
         # see if multi-spheres are present
-        if "mol" in args:
+        if "mol" in kwargs:
             data = collections.OrderedDict()
             nmols = int(self.mol.max())
             nspheres = self.natoms / nmols
 
             for key in self.data.keys():
                 if key != "mol":  # elminate recursive call (we dont need mol anyway)
-                    if type(self.data[key]) == np.ndarray:
-                        data[key] = np.zeros(nmols)
+                    if type(self.data[key]) == numpy.ndarray:
+                        data[key] = numpy.zeros(nmols)
 
                         for atom, prop in enumerate(self.data[key]):
                             data[key][int(self.mol[atom]) - 1] += prop
@@ -839,7 +842,7 @@ class Particles(SubSystem):
             self.Molecules = Particles(units=self._units, data=data)
 
     def _updateSystem(self):
-        """ Class function for updating the state of Particles """
+        """Class function for updating the state of Particles"""
         # Must make sure fname is passed in case we're looping over a trajectory
 
         # If we are updating (looping over traj) we wanna keep the id (ref) of the class constant
@@ -859,7 +862,7 @@ class Particles(SubSystem):
         particles, and <...> is the ensemble average. Alternatively, one can
         compute ROG as \sum_i <r_i^T r_i> - rm ^T rm
         """
-        positions = np.array([self.x, self.y, self.z]).T
+        positions = numpy.array([self.x, self.y, self.z]).T
         rm = positions.mean(axis=0)
         N = len(positions)
 
@@ -867,16 +870,18 @@ class Particles(SubSystem):
         rog = 0.0
 
         for pos in dr:
-            rog += np.dot(pos, pos)
+            rog += numpy.dot(pos, pos)
 
-        return np.sqrt(rog / N)
+        return numpy.sqrt(rog / N)
 
     def computeCOM(self):
-        """ Returns center of mass """
-        vol = 4.0 / 3.0 * np.pi * self.radius ** 3
+        """Returns center of mass"""
+        vol = 4.0 / 3.0 * numpy.pi * self.radius ** 3
 
         return (
-            np.array([np.dot(self.x, vol), np.dot(self.y, vol), np.dot(self.z, vol)])
+            numpy.array(
+                [numpy.dot(self.x, vol), numpy.dot(self.y, vol), numpy.dot(self.z, vol)]
+            )
             / vol.sum()
         )
 
@@ -885,16 +890,16 @@ class Particles(SubSystem):
         by sorting the radial components and returning the average of the sqrt
         of the radius of the first N max data points.
         """
-        positions = np.array([self.x, self.y, self.z]).T
+        positions = numpy.array([self.x, self.y, self.z]).T
         x, y, z = self.x, self.y, self.z
         rm = positions.mean(axis=0)
 
         r = (x - rm[0]) ** 2.0 + (y - rm[1]) ** 2.0 + (z - rm[2]) ** 2.0
         r.sort()
 
-        return np.sqrt(r[-N:]).mean()
+        return numpy.sqrt(r[-N:]).mean()
 
-    def computeRDF(self, dr=None, center=True, rMax=None, npts=100):
+    def computeRDF(self, dr=None, center=True, rMax=None, npts=100, optimize=False):
         """Computes the three-dimensional radial distribution function for a set of
         spherical particles contained in a cube with side length S.  This simple
         function finds reference particles such that a sphere of radius rMax drawn
@@ -914,7 +919,6 @@ class Particles(SubSystem):
         :return: (rdf as numpy array, radii of spherical shells as numpy array, indices of particles)
         :rtype: tuple
         """
-
         if not (self.natoms > 0):
             raise RuntimeError("No Particles found.")
 
@@ -934,6 +938,17 @@ class Particles(SubSystem):
         if dr is None:
             dr = rMax / npts
 
+        if optimize:
+            raise NotImplementedError(
+                "Optimized code not yet supported for this method."
+            )
+            # try:
+            #    from .opt_core import computeRDF
+
+            #    return computeRDF(x, y, z, dr, S, rMax)
+            # except ValueError:
+            #    raise ValueError
+
         # Find particles which are close enough to the cube center that a sphere of radius
         # rMax will not cross any face of the cube
 
@@ -951,40 +966,41 @@ class Particles(SubSystem):
         bools5 = z > rMax - S
         bools6 = z < (S - rMax)
 
-        (interior_indices,) = np.where(
+        (interior_indices,) = numpy.where(
             bools1 * bools2 * bools3 * bools4 * bools5 * bools6
         )
         num_interior_particles = len(interior_indices)
 
         if num_interior_particles < 1:
             raise RuntimeError(
-                "No particles found for which a sphere of radius rMax will lie entirely within a cube of side length {}.  Decrease rMax or increase the size of the cube.".format(
-                    S
-                )
+                "No particles found for which a sphere of radius rMax will lie entirely within a cube of side length {}. "
+                "Decrease rMax or increase the size of the cube.".format(S)
             )
 
-        edges = np.arange(0.0, rMax + 1.1 * dr, dr)
+        edges = numpy.arange(0.0, rMax + 1.1 * dr, dr)
         num_increments = len(edges) - 1
-        g = np.zeros([num_interior_particles, num_increments])
-        radii = np.zeros(num_increments)
+        g = numpy.zeros([num_interior_particles, num_increments])
+        radii = numpy.zeros(num_increments)
         numberDensity = num_interior_particles / S ** 3
 
         # Compute pairwise correlation for each interior particle
         for p in range(num_interior_particles):
             index = interior_indices[p]
-            d = np.sqrt((x[index] - x) ** 2 + (y[index] - y) ** 2 + (z[index] - z) ** 2)
+            d = numpy.sqrt(
+                (x[index] - x) ** 2 + (y[index] - y) ** 2 + (z[index] - z) ** 2
+            )
             d[index] = 2.0 * rMax
-            (result, bins) = np.histogram(d, bins=edges, normed=False)
+            (result, bins) = numpy.histogram(d, bins=edges)
             g[p, :] = result
 
         # Average g(r) for all interior particles and compute radii
-        g_average = np.zeros(num_increments)
+        g_average = numpy.zeros(num_increments)
         for i in range(num_increments):
             radii[i] = (edges[i] + edges[i + 1]) / 2.0
             rOuter = edges[i + 1]
             rInner = edges[i]
-            g_average[i] = np.mean(g[:, i]) / (
-                4.0 / 3.0 * np.pi * (rOuter ** 3 - rInner ** 3)
+            g_average[i] = numpy.mean(g[:, i]) / (
+                4.0 / 3.0 * numpy.pi * (rOuter ** 3 - rInner ** 3)
             )
 
         return (g_average / numberDensity, radii, interior_indices)
@@ -1000,7 +1016,7 @@ class Particles(SubSystem):
         dL = 0.25 * (x.max() - x.min()) + 0.25 * (y.max() - y.min())
         z_max = z.max() - z.min() - self.radius.mean()
 
-        return np.arctan(z_max / dL) * 180.0 / np.pi
+        return numpy.arctan(z_max / dL) * 180.0 / numpy.pi
 
     def computeMass(self, tdensity):
         """Computes the mass of all particles
@@ -1011,7 +1027,7 @@ class Particles(SubSystem):
         if self.natoms > 0:
 
             radius = self.radius
-            mass = tdensity * 4.0 / 3.0 * np.pi * (radius ** 3.0)
+            mass = tdensity * 4.0 / 3.0 * numpy.pi * (radius ** 3.0)
 
             return mass
         else:
@@ -1036,9 +1052,9 @@ class Particles(SubSystem):
         if hasattr(self, "type"):
             ptypes = self.type
         else:
-            ptypes = np.ones(self.natoms)
+            ptypes = numpy.ones(self.natoms)
 
-        if len(np.unique(ptypes)) != 2:
+        if len(numpy.unique(ptypes)) != 2:
             raise ValueError(
                 "Intensity of segergation can be computed only for a binary system."
             )
@@ -1048,9 +1064,9 @@ class Particles(SubSystem):
         ny = int((self.y.max() - self.y.min()) / resol) + 1
         nz = int((self.z.max() - self.z.min()) / resol) + 1
 
-        indices = np.zeros((nx, ny, nz), dtype="float64")
+        indices = numpy.zeros((nx, ny, nz), dtype="float64")
 
-        for sn, ctype in enumerate(np.unique(ptypes)):
+        for sn, ctype in enumerate(numpy.unique(ptypes)):
 
             parts = self[ptypes == ctype]
 
@@ -1059,9 +1075,9 @@ class Particles(SubSystem):
                 attr=("x", "y", "z"),
             )
 
-            x = np.array(parts.x / resol, dtype="int64")
-            y = np.array(parts.y / resol, dtype="int64")
-            z = np.array(parts.z / resol, dtype="int64")
+            x = numpy.array(parts.x / resol, dtype="int64")
+            y = numpy.array(parts.y / resol, dtype="int64")
+            z = numpy.array(parts.z / resol, dtype="int64")
 
             for i in range(parts.natoms):
                 indices[x[i], y[i], z[i]] += parts.radius[i] ** 3
@@ -1075,7 +1091,7 @@ class Particles(SubSystem):
 
         return aStd ** 2 / (aMean * (1.0 - aMean)), indices_a, indices
 
-    def computeScaleSegregation(self, nTrials=1000, resol=None, Npts=50, maxDist=None):
+    def computeScaleSegregation(self, nTrials=1000, resol=None, npts=50, maxDist=None):
         """Computes the correlation coefficient as defined by Danckwerts:
         R(r) = a * b / std(a)**2
 
@@ -1083,7 +1099,7 @@ class Particles(SubSystem):
 
         @[resol]: bin size for grid construction (default min radius)
         @[nTrials]: number of Monte Carlo trials (sample size)
-        @[Npts]: number of bins for histogram construction
+        @[npts]: number of bins for histogram construction
         @[maxDist]: maximum distance (in units of grid size) to sample
 
         Returns the coefficient of correlation R(r) and separation distance (r)
@@ -1096,26 +1112,26 @@ class Particles(SubSystem):
 
         if not maxDist:
             maxDim = max(a.shape)
-            maxDist = int(np.sqrt(3 * maxDim ** 2)) + 1
+            maxDist = int(numpy.sqrt(3 * maxDim ** 2)) + 1
 
         volMean = a[total > 0].mean()
         volVar = a[total > 0].std() ** 2
 
-        corr = np.zeros(nTrials)
-        dist = np.zeros(nTrials)
+        corr = numpy.zeros(nTrials)
+        dist = numpy.zeros(nTrials)
         count = 0
 
         # Begin Monte Carlo simulation
         while count < nTrials:
 
-            i1, i2 = np.random.randint(0, a.shape[0], size=2)
-            j1, j2 = np.random.randint(0, a.shape[1], size=2)
-            k1, k2 = np.random.randint(0, a.shape[2], size=2)
+            i1, i2 = numpy.random.randint(0, a.shape[0], size=2)
+            j1, j2 = numpy.random.randint(0, a.shape[1], size=2)
+            k1, k2 = numpy.random.randint(0, a.shape[2], size=2)
 
             # Make sure we are sampling non-void spatial points
             if total[i1, j1, k1] > 0 and total[i2, j2, k2] > 0:
 
-                distance = np.sqrt((i2 - i1) ** 2 + (j2 - j1) ** 2 + (k2 - k1) ** 2)
+                distance = numpy.sqrt((i2 - i1) ** 2 + (j2 - j1) ** 2 + (k2 - k1) ** 2)
 
                 if distance <= maxDist:
 
@@ -1125,11 +1141,11 @@ class Particles(SubSystem):
                     dist[count] = distance
                     count += 1
 
-        corrfunc, distance, _ = binned_statistic(dist, corr, "mean", Npts)
+        corrfunc, distance, _ = binned_statistic(dist, corr, "mean", npts)
 
         return (
-            corrfunc[np.invert(np.isnan(corrfunc))],
-            distance[0:-1][np.invert(np.isnan(corrfunc))] * resol,
+            corrfunc[numpy.invert(numpy.isnan(corrfunc))],
+            distance[0:-1][numpy.invert(numpy.isnan(corrfunc))] * resol,
         )
 
     def computeDensity(self, tdensity, shape="box", bounds=None):
@@ -1158,7 +1174,7 @@ class Particles(SubSystem):
         else:
             raise ValueError("Axis can be only x, y, or z.")
 
-        thick = np.arange(r.min(), r.max(), dr)
+        thick = numpy.arange(r.min(), r.max(), dr)
         odensity = []
 
         for i in range(len(thick) - 1):
@@ -1192,17 +1208,17 @@ class Particles(SubSystem):
             elif shape == "cylinder-z":
                 height = zmax - zmin
                 radius = (ymax - ymin) * 0.25 + (xmax - xmin) * 0.25
-                volume = np.pi * radius ** 2.0 * height
+                volume = numpy.pi * radius ** 2.0 * height
 
             elif shape == "cylinder-y":
                 height = ymax - ymin
                 radius = (zmax - zmin) * 0.25 + (xmax - xmin) * 0.25
-                volume = np.pi * radius ** 2.0 * height
+                volume = numpy.pi * radius ** 2.0 * height
 
             elif shape == "cylinder-x":
                 height = xmax - xmin
                 radius = (ymax - ymin) * 0.25 + (zmax - zmin) * 0.25
-                volume = np.pi * radius ** 2.0 * height
+                volume = numpy.pi * radius ** 2.0 * height
 
             return volume
 
@@ -1268,7 +1284,7 @@ class Particles(SubSystem):
         return frame
 
     def write(self, filename):
-        """ Write a single output file """
+        """Write a single output file"""
         ftype = filename.split(".")[-1]
         if ftype == "dump":
             self._writeDumpFile(filename)
@@ -1276,7 +1292,7 @@ class Particles(SubSystem):
             raise NotImplementedError
 
     def _writeDumpFile(self, filename):
-        """ Writes a single dump file"""
+        """Writes a single dump file"""
         with open(filename, "a") as fp:
 
             if "timestep" not in self.data:
@@ -1352,7 +1368,7 @@ class Particles(SubSystem):
 
         # This doesnot work for 2D / 1D systems
         for key in self.data.keys():
-            if isinstance(self.data[key], np.ndarray):
+            if isinstance(self.data[key], numpy.ndarray):
                 if len(self.data[key].shape) > 1:
                     if self.data[key].shape[1] == 3:
                         self.data[key + "x"] = self.data[key][:, 0]
@@ -1364,7 +1380,7 @@ class Particles(SubSystem):
         return 0  # how to return timestep?
 
     def _readDumpFile(self):
-        """ Reads a single dump file"""
+        """Reads a single dump file"""
         count = 0
         ts = None
 
@@ -1404,7 +1420,7 @@ class Particles(SubSystem):
         keys = line.split()[2:]  # remove ITEM: and ATOMS keywords
 
         for key in keys:
-            self.data[key] = np.zeros(natoms)
+            self.data[key] = numpy.zeros(natoms)
 
         for i in range(self.data["natoms"]):
             var = self._fp.readline().split()
@@ -1725,7 +1741,7 @@ class System(object):
 
     @property
     def keys(self):
-        """ returns the key objects found in the trajctory files """
+        """returns the key objects found in the trajctory files"""
         return self.data.keys()
 
     def rewind(self):
@@ -1737,7 +1753,7 @@ class System(object):
         return self.next()
 
     def next(self):
-        """ This method updates the system attributes. """
+        """This method updates the system attributes."""
         update_frame = False
 
         try:
@@ -1796,7 +1812,7 @@ class System(object):
 
 
 def numericalSort(value):
-    """ A sorting function by numerical numbers for glob.glob """
+    """A sorting function by numerical numbers for glob.glob"""
 
     numbers = re.compile(r"(\d+)")
     parts = numbers.split(value)
@@ -1838,12 +1854,14 @@ def select(data, *region):
         # This is so hackish!
         if len(x) > 0:
 
-            indices = np.intersect1d(np.where(x > xmin)[0], np.where(x < xmax)[0])
-            indices = np.intersect1d(np.where(y > ymin)[0], indices)
-            indices = np.intersect1d(np.where(y < ymax)[0], indices)
+            indices = numpy.intersect1d(
+                numpy.where(x > xmin)[0], numpy.where(x < xmax)[0]
+            )
+            indices = numpy.intersect1d(numpy.where(y > ymin)[0], indices)
+            indices = numpy.intersect1d(numpy.where(y < ymax)[0], indices)
 
-            indices = np.intersect1d(np.where(z > zmin)[0], indices)
-            indices = np.intersect1d(np.where(z < zmax)[0], indices)
+            indices = numpy.intersect1d(numpy.where(z > zmin)[0], indices)
+            indices = numpy.intersect1d(numpy.where(z < zmax)[0], indices)
 
         else:
             indices = []
