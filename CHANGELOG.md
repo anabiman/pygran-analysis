@@ -13,7 +13,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - CircleCI config for continuous integration
 - Added License file
 
-## [1.1.0]
+## [1.0.1]
 ### Added
 - Submodule 'generator' from PyGran.simulation
 - Support for VTK file formats: vtp + vtu
@@ -26,6 +26,17 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Method computeGCOM() in core.py*
 - Attribute 'length' for Particles.molecule
 
-## [1.1.1]
+## [1.1.0]
+### Added
+- Versioneer for automated version control
+- Test cases for pytest
+
 ### Changed
+- Refactored pakcage structure
 - Fixed bug with computeIntensitySegregation: 'self.types' typo
+- Method Particles.computeRDF no longer uses deprecated 'normed' in numpy.histogram
+- Arg 'Npts' renamed to 'npts' in Method Particles.computeScaleSegregation
+  
+### Removed
+- Old versioning system
+- Optimized core.pyx
