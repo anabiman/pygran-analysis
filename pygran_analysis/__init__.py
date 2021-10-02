@@ -3,13 +3,13 @@ Created on Apil 25, 2016
 Author: Andrew Abi-Mansour
 
 This is the::
- __________         ________
-██████╗ ██╗   ██╗ ██████╗ ██████╗  █████╗ ███╗   ██╗
-██╔══██╗╚██╗ ██╔╝██╔════╝ ██╔══██╗██╔══██╗████╗  ██║
-██████╔╝ ╚████╔╝ ██║  ███╗██████╔╝███████║██╔██╗ ██║
-██╔═══╝   ╚██╔╝  ██║   ██║██╔══██╗██╔══██║██║╚██╗██║
-██║        ██║   ╚██████╔╝██║  ██║██║  ██║██║ ╚████║
-╚═╝        ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝
+
+	██████╗ ██╗   ██╗ ██████╗ ██████╗  █████╗ ███╗   ██╗
+	██╔══██╗╚██╗ ██╔╝██╔════╝ ██╔══██╗██╔══██╗████╗  ██║
+	██████╔╝ ╚████╔╝ ██║  ███╗██████╔╝███████║██╔██╗ ██║
+	██╔═══╝   ╚██╔╝  ██║   ██║██╔══██╗██╔══██║██║╚██╗██║
+	██║        ██║   ╚██████╔╝██║  ██║██║  ██║██║ ╚████║
+	╚═╝        ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝
                                                                                                                                                                    $        
 DEM simulation and analysis toolkit
 http://www.pygran.org, support@pygran.org
@@ -34,13 +34,9 @@ __version__ = versions["version"]
 __git_revision__ = versions["full-revisionid"]
 del get_versions, versions
 
-from .core import *
 from . import dynamics
 from . import equilibrium
 from . import imaging
 from . import core
+from .core import *
 from . import generator
-
-from ._version import get_versions
-__version__ = get_versions()['version']
-del get_versions
