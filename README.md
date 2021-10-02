@@ -1,6 +1,6 @@
 # Welcome to the PyGran.analysis webpage!
 
-PyGran.analysis is a submodule in PyGran, an open-source toolkit primarily designed for analyzing DEM simulation data. You can read more about PyGran [here](http://www.pygran.org). 
+PyGranAnalysis is an open-source toolkit primarily designed for analyzing DEM simulation data. It is part of the [PyGran](http://www.pygran.org) ecosystem. 
 
 **If your find PyGran useful in your research, please consider citing the following paper:**
 
@@ -20,25 +20,25 @@ PyGran.analysis is a submodule in PyGran, an open-source toolkit primarily desig
 ```
 
 ## Quick Installation
-PyGran.analysis is typically installed with other PyGran submodules. See [here](http://andrew-abimansour.github.io/PyGran/docs/introduction.html#installation) for more info. For a solo PyGran.analysis local installation, simply clone this repository and then use pip (or pip3) to run from the source dir:
+PyGranAnalysis is typically installed with other PyGran packages. See [here](http://andrew-abimansour.github.io/PyGran/docs/introduction.html#installation) for more info. For a solo installation, simply run:
 ```bash
-pip install . --user
+pip install pygran_analysis
 ```
-You can alternatively run ``setup.py`` to build and/install the package. See ``setup.py -h`` for more info.
+You can alternatively clone this repository run ``setup.py`` to build and/install the package from its source code. See ``setup.py -h`` for more info.
 
 ## Basic Usage
-Using PyGran.analysis for doing post-analysis is quite straight forward. Computing particle overlaps shown below for instance can be done in few lines of code:
+Doing post-analysis with PyGranAnalysis is quite straight forward. Computing particle overlaps shown below for instance can be done in few lines of code:
 
 <p style="text-align:center;"><img src="http://andrew-abimansour.github.io/PyGran/images/overlap-hist.png"></p>
 
 ```python
-import analysis
+import pygran_analysis
 
 # Instantiate a System class from a dump file
-Gran = analysis.System(Particles='granular.dump')
+gran = pygran_analysis.System(Particles='granular.dump')
 
 # Instantiate a nearest-neighbors class
-NNS = analysis.Neighbors(Particles=Gran.Particles)
+nns = analysis.Neighbors(Particles=Gran.Particles)
 overlaps = NNS.overlaps
 ```
 For more examples on using PyGran for analyzing DEM simulation, check out the <a href="http://andrew-abimansour.github.io/PyGran/tests/examples.html">examples</a> page.
