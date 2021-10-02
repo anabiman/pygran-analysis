@@ -69,7 +69,7 @@ jobs:
       shell: bash
 
       run: |
-        pytest -v --cov=pygran_analysis --cov-report=xml --color=yes --trajf "pygran_analysis/tests/data/particles*.dump" pygran_analysis
+        pytest -v --cov=pygran_analysis --cov-report=xml --color=yes --trajf "pygran_analysis/tests/data/particles*.dump" pygran_analysis/tests/
 
     - name: CodeCov
       uses: codecov/codecov-action@v1
