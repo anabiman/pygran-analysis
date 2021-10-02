@@ -75,7 +75,7 @@ def readExcel(fname):
 
 
 def _mapPositions(Particles, axis, resol=None):
-    """ Maps particle positions to pixels """
+    """Maps particle positions to pixels"""
     if axis == "x":
         h = Particles.x
 

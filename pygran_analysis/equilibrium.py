@@ -115,12 +115,12 @@ class Neighbors(object):
 
     @property
     def distances(self):
-        " Returns all neighbor pair-wise distance "
+        "Returns all neighbor pair-wise distance"
         return self._distances
 
     @property
     def pairs(self):
-        " Returns the pair indices for each overlap "
+        "Returns the pair indices for each overlap"
         return self._pairs
 
     def coon(self, type1=1, type2=2):

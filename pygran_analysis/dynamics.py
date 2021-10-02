@@ -33,7 +33,7 @@ import numpy
 
 
 class Temporal(object):
-    """ A generic class that enables time-dependent analysis of DEM data """
+    """A generic class that enables time-dependent analysis of DEM data"""
 
     def __init__(self, System):
         self.System = System
