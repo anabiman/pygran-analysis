@@ -1,5 +1,5 @@
 # Import the analysis module from PyGran
-from PyGran import analysis
+import pygran_analysis as analysis
 import sys
 import pytest
 

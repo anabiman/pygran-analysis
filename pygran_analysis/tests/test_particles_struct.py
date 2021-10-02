@@ -1,4 +1,4 @@
-from PyGran import analysis
+import pygran_analysis as analysis
 import sys
 
 
