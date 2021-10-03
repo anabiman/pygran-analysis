@@ -2,23 +2,32 @@ import pygran_analysis as analysis
 import sys
 
 
-def test_foo(trajf):
+def test_system_rdf(trajf):
     # Create a granular object from a LIGGGHTS dump file
-    Sys = analysis.System(Particles=trajf, units="si")
+    sys = analysis.System(Particles=trajf, units="si")
 
     # Go to last frame
-    Sys.goto(-1)
+    sys.goto(-1)
 
     # Switch to micro unit system
-    Sys.units("micro")
+    sys.units("micro")
 
     # Compute the radial distribution function
-    g, r, _ = Sys.Particles.computeRDF()
+    g, r, _ = sys.Particles.computeRDF()
 
     assert r.max() > 4.0
 
+
+def test_system_neighbors(trajf):
+
+    # Create a granular object from a LIGGGHTS dump file
+    sys = analysis.System(Particles=trajf, units="si")
+
+    # Go to last frame
+    sys.goto(-1)
+
     # Construct a class for nearest neighbor searching
-    Neigh = analysis.equilibrium.Neighbors(Sys.Particles)
+    neigh = analysis.equilibrium.Neighbors(sys.Particles)
 
     # Extract coordination number per particle
-    coon = Neigh.coon
+    coon = neigh.coon
