@@ -54,7 +54,7 @@ from pathlib import Path
 _vtk_formats = [".vtk", ".vtu", ".vtp"]
 
 
-class SubSystem(object):
+class SubSystem:
     """ The SubSystem is an abstract class the implementation of which stores all DEM object properties and the methods that operate on \
 these properties. This class is iterable but NOT an iterator. 
 
@@ -1491,7 +1491,7 @@ class Particles(SubSystem):
         return frame + 1
 
 
-class Factory(object):
+class Factory:
     """A factory for system class. It creates subclasses of SubSystems. Its only two methods
     are static, thus no need to instantiate this class.
 
@@ -1606,7 +1606,7 @@ class Factory(object):
     _str_to_class = staticmethod(_str_to_class)
 
 
-class System(object):
+class System:
     """A System contains all the information describing a DEM system.
     A meaningful system always requires at least one trajectory file to read. A trajectory is a (time)
     series corresponding to the coordinates of all particles/meshes/objects in the system.
@@ -1775,12 +1775,12 @@ class System(object):
                     elif hasattr(self.__dict__[ss], "_readFile"):
                         self.__dict__[ss]._readFile(self.frame + 1)
                         update_frame = True
-        except:
+        except StopIteration:
             self.rewind()
             raise StopIteration
         else:
             # we update the fame only after _readFile is called. If the latter
-            # fails, the frame is not updated (due to raise), which is exactly
+            # fails, the frame is not updated (due to exception raise), which is exactly
             # the behavior we want. Ding!
             if update_frame:
                 self.frame += 1
@@ -1809,6 +1809,16 @@ class System(object):
 
                 elif hasattr(self.__dict__[ss], "_updateSystem"):
                     self.__dict__[ss]._updateSystem()
+
+    def __len__(self):
+        """Returns the total number of stored SubSystem objects."""
+        return len(
+            [
+                key
+                for key, value in self.__dict__.items()
+                if isinstance(value, SubSystem)
+            ]
+        )
 
 
 def numericalSort(value):
