@@ -30,13 +30,15 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
 - Versioneer for automated version control
 - Test cases for pytest
+- Method __len__ for System class
 
 ### Changed
 - Refactored pakcage structure
 - Fixed bug with computeIntensitySegregation: 'self.types' typo
 - Method Particles.computeRDF no longer uses deprecated 'normed' in numpy.histogram
 - Arg 'Npts' renamed to 'npts' in Method Particles.computeScaleSegregation
-  
+
 ### Removed
 - Old versioning system
 - Optimized core.pyx
+- System.keys (undefined)
