@@ -36,25 +36,6 @@ from setuptools import find_packages, setup
 
 import versioneer
 
-try:
-    import numpy
-    from Cython.Build import cythonize
-
-    optimal_list = cythonize(
-        "pygran_analysis/opt_core.pyx",
-        compiler_directives={"language_level": "3"},
-        annotate=True,
-    )
-    include_dirs = [numpy.get_include()]
-except Exception:
-    warnings.warn(
-        "Could not cythonize. Make sure Cython and NumPy are properly installed. "
-        "Proceeding with unoptimized code ...",
-        UserWarning,
-    )
-    optimal_list = []
-    include_dirs = []
-
 setup(
     name="pygran_analysis",
     version=versioneer.get_version(),
@@ -69,7 +50,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=["numpy", "scipy"],
-    extras_require={"extras": ["vtk", "cython"], "tests": ["pytest"]},
+    extras_require={"extras": ["vtk"], "tests": ["pytest"]},
     classifiers=[
         "Development Status :: 4 - Beta",
         "Topic :: Utilities",
@@ -77,11 +58,8 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
-        "Programming Language :: Cython",
         "Operating System :: POSIX :: Linux",
     ],
     zip_safe=False,
-    ext_modules=optimal_list,
-    include_dirs=include_dirs,
     cmdclass=versioneer.get_cmdclass(),
 )
