@@ -1,6 +1,6 @@
 # Welcome to the PyGran.analysis webpage!
 [//]: # (Badges)
-[![CI](https://github.com/Andrew-AbiMansour/PyGranAnalysis/actions/workflows/CI.yaml/badge.svg)](https://github.com/Andrew-AbiMansour/PyGranAnalysis/actions/workflows/CI.yaml)
+[![CI](https://github.com/Andrew-AbiMansour/PyGranAnalysis/actions/workflows/test.yaml/badge.svg)](https://github.com/Andrew-AbiMansour/PyGranAnalysis/actions/workflows/test.yaml)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/Andrew-AbiMansour/PyGranAnalysis.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Andrew-AbiMansour/PyGranAnalysis/alerts/)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/Andrew-AbiMansour/PyGranAnalysis.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Andrew-AbiMansour/PyGranAnalysis/context:python)
 [![codecov](https://codecov.io/gh/Andrew-AbiMansour/PyGranAnalysis/branch/master/graph/badge.svg)](https://codecov.io/gh/Andrew-AbiMansour/PyGranAnalysis/branch/master)
