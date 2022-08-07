@@ -65,7 +65,7 @@ setup(
     ),
     license="GNU v2",
     keywords="Discrete Element Method, Granular Materials",
-    url="www.PyGran.org",
+    url="http://pygran.org",
     packages=find_packages(),
     include_package_data=True,
     install_requires=["numpy", "scipy"],
