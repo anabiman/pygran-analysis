@@ -29,14 +29,16 @@ If not, see http://www.gnu.org/licenses . See also top-level README
 and LICENSE files.
 """
 
-import numpy
-
+import collections
+import glob
+import os
+import re
+import sys
 import types
 from random import choice
 from string import ascii_uppercase
-import glob
-import re, sys, os
-import collections
+
+import numpy
 
 try:
     import vtk
@@ -45,21 +47,23 @@ except Exception:
     vtk = None
     vtk_to_numpy = None
 
-from .tools import convert
-from scipy.stats import binned_statistic
 import importlib
 import numbers
 from pathlib import Path
+
+from scipy.stats import binned_statistic
+
+from .tools import convert
 
 _vtk_formats = [".vtk", ".vtu", ".vtp"]
 
 
 class SubSystem:
     """ The SubSystem is an abstract class the implementation of which stores all DEM object properties and the methods that operate on \
-these properties. This class is iterable but NOT an iterator. 
+these properties. This class is iterable but NOT an iterator.
 
 	:param units: unit system
-	:type units: string 
+	:type units: string
 
 	:note: See `code <https://github.com/Andrew-AbiMansour/PyGranAnalysis/blob/master/PyGranAnalysis/tools.py>`_ for available unit systems
 	"""
@@ -76,7 +80,7 @@ these properties. This class is iterable but NOT an iterator.
         self._args = args
         self._iargs = args.copy()  # used for re-initializing system
 
-        if type(self).__name__ in args:
+        if type(self).__name__ in args:  # object already exists
 
             # copy constructor
             # delete data if it exists
@@ -119,7 +123,15 @@ these properties. This class is iterable but NOT an iterator.
                 self._fname = args["fname"]
 
             if self._fname:
-                if Path(self._fname).suffix in _vtk_formats:
+                if (
+                    Path(getattr(self, "_mesh", self._fname)).suffix in _vtk_formats
+                ):  # incredibly hackish
+
+                    if vtk is None:
+                        raise Exception(
+                            "VTK library not available. Mesh functionality disabled."
+                        )
+
                     if "vtk_type" in args:
                         self._vtk = args["vtk_type"]
                     else:
@@ -546,6 +558,9 @@ class Mesh(SubSystem):
     """
 
     def __init__(self, **args):
+        if vtk is None:
+            raise Exception("VTK library not available. Cannot create Mesh objects.")
+
         self._initialize(**args)
 
     def _initialize(self, **args):
@@ -553,7 +568,7 @@ class Mesh(SubSystem):
         if "fname" in args:
             self._fname = args["fname"]
 
-        super(Mesh, self)._initialize(**args)
+        super()._initialize(**args)
 
         if "avgCellData" not in args:
             args["avgCellData"] = False
@@ -561,8 +576,8 @@ class Mesh(SubSystem):
         # Assert mesh input filname is VTK
         if not hasattr(self, "_mesh"):
             if self._fname:
-                if self._fname.split(".")[-1] != "vtk":
-                    raise IOError("Input mesh must be of VTK type.")
+                if Path(self._fname).suffix != ".vtk":
+                    raise IOError(f"Input mesh must be of VTK type:{self._fname}")
 
                 self._fname = sorted(glob.glob(self._fname), key=numericalSort)
                 self._mesh = self._fname[0]
@@ -876,7 +891,7 @@ class Particles(SubSystem):
 
     def computeCOM(self):
         """Returns center of mass"""
-        vol = 4.0 / 3.0 * numpy.pi * self.radius ** 3
+        vol = 4.0 / 3.0 * numpy.pi * self.radius**3
 
         return (
             numpy.array(
@@ -981,7 +996,7 @@ class Particles(SubSystem):
         num_increments = len(edges) - 1
         g = numpy.zeros([num_interior_particles, num_increments])
         radii = numpy.zeros(num_increments)
-        numberDensity = num_interior_particles / S ** 3
+        numberDensity = num_interior_particles / S**3
 
         # Compute pairwise correlation for each interior particle
         for p in range(num_interior_particles):
@@ -1000,7 +1015,7 @@ class Particles(SubSystem):
             rOuter = edges[i + 1]
             rInner = edges[i]
             g_average[i] = numpy.mean(g[:, i]) / (
-                4.0 / 3.0 * numpy.pi * (rOuter ** 3 - rInner ** 3)
+                4.0 / 3.0 * numpy.pi * (rOuter**3 - rInner**3)
             )
 
         return (g_average / numberDensity, radii, interior_indices)
@@ -1027,7 +1042,7 @@ class Particles(SubSystem):
         if self.natoms > 0:
 
             radius = self.radius
-            mass = tdensity * 4.0 / 3.0 * numpy.pi * (radius ** 3.0)
+            mass = tdensity * 4.0 / 3.0 * numpy.pi * (radius**3.0)
 
             return mass
         else:
@@ -1089,7 +1104,7 @@ class Particles(SubSystem):
         aMean = indices_a[indices > 0].mean()
         aStd = indices_a[indices > 0].std()
 
-        return aStd ** 2 / (aMean * (1.0 - aMean)), indices_a, indices
+        return aStd**2 / (aMean * (1.0 - aMean)), indices_a, indices
 
     def computeScaleSegregation(self, nTrials=1000, resol=None, npts=50, maxDist=None):
         """Computes the correlation coefficient as defined by Danckwerts:
@@ -1112,7 +1127,7 @@ class Particles(SubSystem):
 
         if not maxDist:
             maxDim = max(a.shape)
-            maxDist = int(numpy.sqrt(3 * maxDim ** 2)) + 1
+            maxDist = int(numpy.sqrt(3 * maxDim**2)) + 1
 
         volMean = a[total > 0].mean()
         volVar = a[total > 0].std() ** 2
@@ -1208,17 +1223,17 @@ class Particles(SubSystem):
             elif shape == "cylinder-z":
                 height = zmax - zmin
                 radius = (ymax - ymin) * 0.25 + (xmax - xmin) * 0.25
-                volume = numpy.pi * radius ** 2.0 * height
+                volume = numpy.pi * radius**2.0 * height
 
             elif shape == "cylinder-y":
                 height = ymax - ymin
                 radius = (zmax - zmin) * 0.25 + (xmax - xmin) * 0.25
-                volume = numpy.pi * radius ** 2.0 * height
+                volume = numpy.pi * radius**2.0 * height
 
             elif shape == "cylinder-x":
                 height = xmax - xmin
                 radius = (ymax - ymin) * 0.25 + (zmax - zmin) * 0.25
-                volume = numpy.pi * radius ** 2.0 * height
+                volume = numpy.pi * radius**2.0 * height
 
             return volume
 
@@ -1570,7 +1585,7 @@ class Factory:
                 obj.append([ss, args[ss]])
             else:
                 raise ValueError(
-                    "Incorrect keyarg supplied to System: {} when creating {} SubSystem".format(
+                    "Incorrect keyword arg supplied to System: {} when creating {} SubSystem".format(
                         args[ss], ss
                     )
                 )
@@ -1586,8 +1601,9 @@ class Factory:
                 return getattr(module, string)
             else:
                 return getattr(sys.modules[__name__], string)
-        except:
-            pass  # string has no class definition in the specified module
+        except Exception:
+            print(f"No class definition found for {string}")
+            return None
 
     def addprop(inst, name, method):
 
@@ -1738,11 +1754,6 @@ class System:
                 break
             else:
                 self.frame = self.next()
-
-    @property
-    def keys(self):
-        """returns the key objects found in the trajctory files"""
-        return self.data.keys()
 
     def rewind(self):
         """Read trajectory from the beginning"""
