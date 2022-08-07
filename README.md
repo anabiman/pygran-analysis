@@ -1,5 +1,9 @@
 # Welcome to the PyGran.analysis webpage!
-
+[//]: # (Badges)
+[![CI](https://github.com/Andrew-AbiMansour/PyGranAnalysis/actions/workflows/CI.yaml/badge.svg)](https://github.com/Andrew-AbiMansour/PyGranAnalysis/actions/workflows/CI.yaml)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/Andrew-AbiMansour/PyGranAnalysis.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Andrew-AbiMansour/PyGranAnalysis/alerts/)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/Andrew-AbiMansour/PyGranAnalysis.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Andrew-AbiMansour/PyGranAnalysis/context:python)
+[![codecov](https://codecov.io/gh/Andrew-AbiMansour/PyGranAnalysis/branch/master/graph/badge.svg)](https://codecov.io/gh/Andrew-AbiMansour/PyGranAnalysis/branch/master)
 PyGranAnalysis is an open-source toolkit primarily designed for analyzing DEM simulation data. It is part of the [PyGran](http://www.pygran.org) ecosystem. 
 
 **If your find PyGran useful in your research, please consider citing the following paper:**
