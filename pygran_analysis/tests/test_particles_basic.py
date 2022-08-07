@@ -1,5 +1,6 @@
-import pygran_analysis as analysis
 import pytest
+
+import pygran_analysis as analysis
 
 
 def test_particles_basic(trajf):

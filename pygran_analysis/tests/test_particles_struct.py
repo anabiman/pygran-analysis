@@ -1,5 +1,6 @@
-import pygran_analysis as analysis
 import sys
+
+import pygran_analysis as analysis
 
 
 def test_system_rdf(trajf):
@@ -13,7 +14,7 @@ def test_system_rdf(trajf):
     sys.units("micro")
 
     # Compute the radial distribution function
-    g, r, _ = sys.Particles.computeRDF()
+    g, r, _ = sys.Particles.computeRDF(optimize=False)
 
     assert r.max() > 4.0
 

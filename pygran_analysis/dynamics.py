@@ -94,7 +94,7 @@ class Temporal(object):
                         / 3.0
                         * numpy.pi
                         * (self.System.Particles.natoms - N0)
-                        * (self.System.Particles.radius ** 3.0)
+                        * (self.System.Particles.radius**3.0)
                         / time
                     )
                 )

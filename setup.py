@@ -29,14 +29,16 @@ If not, see http://www.gnu.org/licenses . See also top-level README
 and LICENS
 """
 
-from setuptools import setup, find_packages
-import versioneer
-import warnings
 import os
+import warnings
+
+from setuptools import find_packages, setup
+
+import versioneer
 
 try:
-    from Cython.Build import cythonize
     import numpy
+    from Cython.Build import cythonize
 
     optimal_list = cythonize(
         "pygran_analysis/opt_core.pyx",

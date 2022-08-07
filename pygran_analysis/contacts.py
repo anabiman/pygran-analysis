@@ -31,11 +31,12 @@ Python module for determining contacts/overlaps in an N-particle system
 
 """
 
+import matplotlib.pylab as plt
 import numpy
 from scipy import spatial
 from scipy.linalg import norm
+
 from .models import SpringDashpot
-import matplotlib.pylab as plt
 
 
 class Neighbors(object):

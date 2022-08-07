@@ -29,8 +29,10 @@ If not, see http://www.gnu.org/licenses . See also top-level README
 and LICENSE files.
 """
 
-import numpy
 import collections
+
+import numpy
+
 from . import core, equilibrium
 
 

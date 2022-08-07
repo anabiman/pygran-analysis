@@ -1,5 +1,6 @@
-import pygran_analysis as analysis
 import numpy
+
+import pygran_analysis as analysis
 
 
 def run_compute(Parts):

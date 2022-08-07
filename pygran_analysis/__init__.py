@@ -34,9 +34,5 @@ __version__ = versions["version"]
 __git_revision__ = versions["full-revisionid"]
 del get_versions, versions
 
-from . import dynamics
-from . import equilibrium
-from . import imaging
-from . import core
+from . import core, dynamics, equilibrium, generator, imaging
 from .core import *
-from . import generator

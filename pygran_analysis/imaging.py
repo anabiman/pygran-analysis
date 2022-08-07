@@ -35,9 +35,11 @@ try:
     from PIL import Image
 except Exception:
     Image = None
-import glob, os
-from numpy import random, array, linspace, sqrt, fabs
+import glob
+import os
+
 import numpy as np
+from numpy import array, fabs, linspace, random, sqrt
 from scipy.stats import binned_statistic
 
 
@@ -191,7 +193,7 @@ def slice(
 
         zmean = (zmax + zmin) / 2
 
-        r = sqrt(Particles.radius ** 2.0 - (h - zmean) ** 2.0)
+        r = sqrt(Particles.radius**2.0 - (h - zmean) ** 2.0)
 
         if not resol:
             return Particles
@@ -206,7 +208,7 @@ def slice(
 
                 for ic in range(-radius, radius + 1):
                     for jc in range(-radius, radius + 1):
-                        if (ic) ** 2 + (jc) ** 2 <= radius ** 2:
+                        if (ic) ** 2 + (jc) ** 2 <= radius**2:
                             if (
                                 (i + ic < length)
                                 and (i + ic >= 0)
@@ -486,7 +488,7 @@ def scaleSegregation(
     maxDim = max(a.shape)
 
     if not maxDist:
-        maxDist = int(np.sqrt(3 * maxDim ** 2)) + 1
+        maxDist = int(np.sqrt(3 * maxDim**2)) + 1
 
     corrfunc = np.zeros(maxDist)
     count = 0
