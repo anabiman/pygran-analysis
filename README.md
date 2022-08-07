@@ -39,6 +39,6 @@ gran = pygran_analysis.System(Particles='granular.dump')
 
 # Instantiate a nearest-neighbors class
 nns = analysis.Neighbors(Particles=Gran.Particles)
-overlaps = NNS.overlaps
+overlaps = nns.overlaps
 ```
 For more examples on using PyGran for analyzing DEM simulation, check out the <a href="http://andrew-abimansour.github.io/PyGran/tests/examples.html">examples</a> page.
