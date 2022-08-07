@@ -873,7 +873,7 @@ class Particles(SubSystem):
 
     def computeROG(self):
         """Computes the radius of gyration (ROG) for an N-particle system:
-        ROG = <\sqrt(\sum_i (r_i - rm)^2)> where rm is the mean position of all
+        ROG = <sqrt(sum_i (r_i - rm)^2)> where rm is the mean position of all
         particles, and <...> is the ensemble average. Alternatively, one can
         compute ROG as \sum_i <r_i^T r_i> - rm ^T rm
         """
